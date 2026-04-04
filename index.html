@@ -439,6 +439,13 @@ function saveData(){
   localStorage.setItem('re_leads_backup_time', new Date().toISOString());
   const day = new Date().getDay();
   localStorage.setItem('re_leads_snap_' + day, JSON.stringify(leads));
+  // Auto Drive backup - agar logged in hai toh silently backup karo
+  if (driveAccessToken) {
+    clearTimeout(window._autoBackupTimer);
+    window._autoBackupTimer = setTimeout(() => {
+      performDriveBackup(true); // true = silent mode
+    }, 3000); // 3 second baad - taaki ek saath kai changes ek backup mein jayen
+  }
 }
 function generateId(){return Date.now().toString(36)+Math.random().toString(36).substr(2)}
 
@@ -1043,8 +1050,8 @@ async function getBackupFileId(folderId) {
   return null;
 }
 
-async function performDriveBackup() {
-  showToast('☁️ Drive mein backup ho raha hai...', '');
+async function performDriveBackup(silent = false) {
+  if (!silent) showToast('☁️ Drive mein backup ho raha hai...', '');
   try {
     const backupData = {
       version: '1.0',
@@ -1054,14 +1061,11 @@ async function performDriveBackup() {
     };
     const content = JSON.stringify(backupData, null, 2);
 
-    // Get or create folder
     const folderId = await getOrCreateFolder();
-    // Check if file exists
     const existingFileId = await getBackupFileId(folderId);
 
     let res;
     if (existingFileId) {
-      // UPDATE existing file — same file, no new file!
       res = await fetch(`https://www.googleapis.com/upload/drive/v3/files/${existingFileId}?uploadType=multipart`, {
         method: 'PATCH',
         headers: {
@@ -1071,7 +1075,6 @@ async function performDriveBackup() {
         body: `--backup_boundary\r\nContent-Type: application/json\r\n\r\n${JSON.stringify({ name: BACKUP_FILENAME })}\r\n--backup_boundary\r\nContent-Type: application/json\r\n\r\n${content}\r\n--backup_boundary--`
       });
     } else {
-      // CREATE new file (sirf pehli baar)
       res = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
         method: 'POST',
         headers: {
@@ -1087,17 +1090,28 @@ async function performDriveBackup() {
     const now = new Date().toISOString();
     localStorage.setItem('re_drive_backup_time', now);
     const d = new Date(now).toLocaleString('hi-IN');
-    document.getElementById('driveBackupTime').textContent = '✅ Last backup: ' + d;
-    showToast(`✅ ${leads.length} leads Drive mein backup ho gaye!`, 'success');
+    const el = document.getElementById('driveBackupTime');
+    if (el) el.textContent = '✅ Last backup: ' + d;
+
+    if (!silent) showToast(`✅ ${leads.length} leads Drive mein backup ho gaye!`, 'success');
+    else showToast('☁️ Auto backup ho gaya!', 'success');
 
   } catch(e) {
     console.error('Drive backup error:', e);
-    if (e.message && e.message.includes('401')) {
-      driveAccessToken = null;
-      sessionStorage.removeItem('drive_token');
-      showToast('⚠️ Session expire — dobara backup karein');
+    if (!silent) {
+      if (e.message && e.message.includes('401')) {
+        driveAccessToken = null;
+        sessionStorage.removeItem('drive_token');
+        showToast('⚠️ Session expire — dobara backup karein');
+      } else {
+        showToast('❌ Backup fail: ' + (e.message || 'Unknown error'));
+      }
     } else {
-      showToast('❌ Backup fail: ' + (e.message || 'Unknown error'));
+      // Silent mode mein token expire ho jaye toh reset karo
+      if (e.message && e.message.includes('401')) {
+        driveAccessToken = null;
+        sessionStorage.removeItem('drive_token');
+      }
     }
   }
 }
