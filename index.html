@@ -1,0 +1,1405 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="theme-color" content="#0f1923">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="RE Diary">
+<link rel="manifest" href="manifest.json">
+<title>🏠 Real Estate Lead Diary</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-primary: #0a0f1a;
+    --bg-card: #111827;
+    --bg-card2: #1a2235;
+    --accent-gold: #d4a843;
+    --accent-gold-light: #f0c96a;
+    --accent-teal: #00d4aa;
+    --accent-red: #ff4d6d;
+    --accent-blue: #4d9fff;
+    --text-primary: #f0f4ff;
+    --text-secondary: #8896b3;
+    --text-muted: #4a5568;
+    --border: #1e2d42;
+    --border-glow: rgba(212, 168, 67, 0.3);
+    --shadow: 0 8px 32px rgba(0,0,0,0.5);
+    --radius: 14px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans Devanagari', 'Rajdhani', sans-serif;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* HEADER */
+  .app-header {
+    background: linear-gradient(135deg, #0f1923 0%, #1a2a3a 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  }
+
+  .app-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .logo-icon {
+    width: 38px;
+    height: 38px;
+    background: linear-gradient(135deg, var(--accent-gold), #e8881a);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    box-shadow: 0 4px 12px rgba(212,168,67,0.4);
+  }
+
+  .app-title-text {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--accent-gold-light);
+    letter-spacing: 0.5px;
+    line-height: 1.1;
+  }
+
+  .app-subtitle {
+    font-size: 10px;
+    color: var(--text-secondary);
+    font-weight: 400;
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 8px;
+  }
+
+  .icon-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--bg-card2);
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    transition: all 0.2s;
+  }
+
+  .icon-btn:hover, .icon-btn.active {
+    border-color: var(--accent-gold);
+    color: var(--accent-gold);
+    background: rgba(212,168,67,0.1);
+  }
+
+  /* STATS BAR */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .stat-item {
+    background: var(--bg-card);
+    padding: 10px 8px;
+    text-align: center;
+  }
+
+  .stat-num {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--accent-gold);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 9px;
+    color: var(--text-muted);
+    margin-top: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* TAB NAV */
+  .tab-nav {
+    display: flex;
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .tab-nav::-webkit-scrollbar { display: none; }
+
+  .tab-btn {
+    flex: 1;
+    min-width: 70px;
+    padding: 12px 8px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 11px;
+    font-family: 'Noto Sans Devanagari', sans-serif;
+    transition: all 0.2s;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+  }
+
+  .tab-btn.active {
+    color: var(--accent-gold);
+    border-bottom-color: var(--accent-gold);
+    background: rgba(212,168,67,0.05);
+  }
+
+  .tab-btn svg { display: block; margin: 0 auto 3px; }
+
+  /* MAIN CONTENT */
+  .main-content {
+    padding: 16px;
+    padding-bottom: 80px;
+  }
+
+  /* SECTION TITLE */
+  .section-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--accent-gold-light);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, var(--border), transparent);
+  }
+
+  /* LEAD CARD */
+  .lead-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+    margin-bottom: 12px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.2s;
+    cursor: pointer;
+  }
+
+  .lead-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+  }
+
+  .lead-card.status-hot::before { background: var(--accent-red); }
+  .lead-card.status-warm::before { background: var(--accent-gold); }
+  .lead-card.status-cold::before { background: var(--accent-blue); }
+  .lead-card.status-converted::before { background: var(--accent-teal); }
+
+  .lead-card:hover {
+    border-color: var(--border-glow);
+    box-shadow: 0 4px 20px rgba(212,168,67,0.1);
+    transform: translateY(-1px);
+  }
+
+  .lead-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+  }
+
+  .lead-name {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+
+  .lead-phone {
+    font-size: 12px;
+    color: var(--accent-teal);
+    margin-top: 2px;
+  }
+
+  .status-badge {
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .badge-hot { background: rgba(255,77,109,0.15); color: var(--accent-red); border: 1px solid rgba(255,77,109,0.3); }
+  .badge-warm { background: rgba(212,168,67,0.15); color: var(--accent-gold); border: 1px solid rgba(212,168,67,0.3); }
+  .badge-cold { background: rgba(77,159,255,0.15); color: var(--accent-blue); border: 1px solid rgba(77,159,255,0.3); }
+  .badge-converted { background: rgba(0,212,170,0.15); color: var(--accent-teal); border: 1px solid rgba(0,212,170,0.3); }
+
+  .lead-project {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--bg-card2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 3px 8px;
+    font-size: 11px;
+    color: var(--accent-gold-light);
+    margin-bottom: 8px;
+  }
+
+  .lead-meta {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: var(--text-secondary);
+  }
+
+  .meta-icon { font-size: 12px; }
+
+  .lead-notes {
+    font-size: 11px;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border);
+    padding-top: 8px;
+    margin-top: 4px;
+    line-height: 1.5;
+  }
+
+  .lead-actions {
+    display: flex;
+    gap: 6px;
+    margin-top: 10px;
+  }
+
+  .action-btn {
+    flex: 1;
+    padding: 7px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg-card2);
+    color: var(--text-secondary);
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    font-family: 'Noto Sans Devanagari', sans-serif;
+  }
+
+  .action-btn.call { border-color: rgba(0,212,170,0.3); color: var(--accent-teal); }
+  .action-btn.call:hover { background: rgba(0,212,170,0.1); }
+  .action-btn.calendar { border-color: rgba(212,168,67,0.3); color: var(--accent-gold); }
+  .action-btn.calendar:hover { background: rgba(212,168,67,0.1); }
+  .action-btn.whatsapp { border-color: rgba(37,211,102,0.3); color: #25d366; }
+  .action-btn.whatsapp:hover { background: rgba(37,211,102,0.1); }
+  .action-btn.edit { border-color: rgba(77,159,255,0.3); color: var(--accent-blue); }
+  .action-btn.edit:hover { background: rgba(77,159,255,0.1); }
+
+  /* FAB */
+  .fab {
+    position: fixed;
+    bottom: 24px;
+    right: 20px;
+    width: 58px;
+    height: 58px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, var(--accent-gold), #e8881a);
+    border: none;
+    color: #0a0f1a;
+    font-size: 26px;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(212,168,67,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+    transition: all 0.2s;
+  }
+
+  .fab:hover {
+    transform: scale(1.08);
+    box-shadow: 0 12px 32px rgba(212,168,67,0.6);
+  }
+
+  /* MODAL */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    z-index: 300;
+    backdrop-filter: blur(4px);
+    align-items: flex-end;
+  }
+
+  .modal-overlay.active { display: flex; }
+
+  .modal {
+    background: var(--bg-card);
+    border-radius: 20px 20px 0 0;
+    padding: 20px 16px 30px;
+    width: 100%;
+    max-height: 92vh;
+    overflow-y: auto;
+    border: 1px solid var(--border);
+    border-bottom: none;
+    animation: slideUp 0.3s ease;
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  .modal-handle {
+    width: 40px;
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    margin: 0 auto 16px;
+  }
+
+  .modal-title {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--accent-gold-light);
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  /* FORM */
+  .form-group {
+    margin-bottom: 14px;
+  }
+
+  .form-label {
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-bottom: 5px;
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .form-input, .form-select, .form-textarea {
+    width: 100%;
+    padding: 11px 13px;
+    background: var(--bg-card2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text-primary);
+    font-size: 14px;
+    font-family: 'Noto Sans Devanagari', sans-serif;
+    transition: all 0.2s;
+    outline: none;
+  }
+
+  .form-input:focus, .form-select:focus, .form-textarea:focus {
+    border-color: var(--accent-gold);
+    box-shadow: 0 0 0 3px rgba(212,168,67,0.1);
+  }
+
+  .form-select option { background: var(--bg-card2); }
+
+  .form-textarea { min-height: 80px; resize: vertical; }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .btn-primary {
+    width: 100%;
+    padding: 14px;
+    background: linear-gradient(135deg, var(--accent-gold), #e8881a);
+    border: none;
+    border-radius: 12px;
+    color: #0a0f1a;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: 'Rajdhani', sans-serif;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+    transition: all 0.2s;
+    margin-top: 6px;
+  }
+
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(212,168,67,0.4); }
+
+  .btn-secondary {
+    width: 100%;
+    padding: 12px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--text-secondary);
+    font-size: 14px;
+    cursor: pointer;
+    margin-top: 8px;
+    font-family: 'Noto Sans Devanagari', sans-serif;
+  }
+
+  /* SEARCH */
+  .search-bar {
+    position: relative;
+    margin-bottom: 16px;
+  }
+
+  .search-bar input {
+    width: 100%;
+    padding: 11px 13px 11px 38px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    color: var(--text-primary);
+    font-size: 13px;
+    font-family: 'Noto Sans Devanagari', sans-serif;
+    outline: none;
+    transition: all 0.2s;
+  }
+
+  .search-bar input:focus { border-color: var(--accent-gold); }
+
+  .search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 15px;
+  }
+
+  /* FILTER CHIPS */
+  .filter-chips {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    margin-bottom: 16px;
+    padding-bottom: 2px;
+  }
+
+  .filter-chips::-webkit-scrollbar { display: none; }
+
+  .chip {
+    padding: 5px 14px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    background: var(--bg-card2);
+    color: var(--text-secondary);
+    font-size: 11px;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Noto Sans Devanagari', sans-serif;
+  }
+
+  .chip.active {
+    border-color: var(--accent-gold);
+    color: var(--accent-gold);
+    background: rgba(212,168,67,0.1);
+  }
+
+  /* CALENDAR SECTION */
+  .followup-list { display: flex; flex-direction: column; gap: 10px; }
+
+  .followup-item {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    transition: all 0.2s;
+  }
+
+  .followup-item:hover { border-color: var(--border-glow); }
+
+  .followup-date-box {
+    min-width: 46px;
+    height: 46px;
+    background: linear-gradient(135deg, rgba(212,168,67,0.2), rgba(212,168,67,0.05));
+    border: 1px solid rgba(212,168,67,0.3);
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .followup-day {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--accent-gold);
+    line-height: 1;
+  }
+
+  .followup-month {
+    font-size: 9px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+  }
+
+  .followup-info { flex: 1; }
+
+  .followup-name {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .followup-time { font-size: 11px; color: var(--accent-teal); margin-top: 1px; }
+
+  .followup-note { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+
+  .add-cal-btn {
+    padding: 6px 12px;
+    border-radius: 8px;
+    background: rgba(212,168,67,0.1);
+    border: 1px solid rgba(212,168,67,0.3);
+    color: var(--accent-gold);
+    font-size: 11px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+
+  .add-cal-btn:hover { background: rgba(212,168,67,0.2); }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 90px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: var(--bg-card2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-size: 13px;
+    color: var(--text-primary);
+    z-index: 500;
+    opacity: 0;
+    transition: all 0.3s;
+    white-space: nowrap;
+    box-shadow: var(--shadow);
+  }
+
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.success { border-color: var(--accent-teal); }
+
+  /* EMPTY STATE */
+  .empty-state {
+    text-align: center;
+    padding: 50px 20px;
+    color: var(--text-muted);
+  }
+
+  .empty-icon { font-size: 50px; margin-bottom: 12px; }
+  .empty-title { font-size: 16px; color: var(--text-secondary); margin-bottom: 6px; }
+  .empty-sub { font-size: 12px; line-height: 1.6; }
+
+  /* INSTALL BANNER */
+  .install-banner {
+    display: none;
+    background: linear-gradient(135deg, rgba(212,168,67,0.15), rgba(232,136,26,0.1));
+    border: 1px solid rgba(212,168,67,0.3);
+    border-radius: var(--radius);
+    padding: 12px 14px;
+    margin-bottom: 16px;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .install-banner.visible { display: flex; }
+
+  .install-text { flex: 1; font-size: 12px; color: var(--text-secondary); line-height: 1.4; }
+  .install-text strong { color: var(--accent-gold); display: block; font-size: 13px; }
+
+  .install-btn {
+    padding: 8px 14px;
+    background: var(--accent-gold);
+    border: none;
+    border-radius: 8px;
+    color: #0a0f1a;
+    font-weight: 700;
+    font-size: 12px;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  /* OVERDUE badge */
+  .overdue-badge {
+    display: inline-block;
+    background: rgba(255,77,109,0.15);
+    color: var(--accent-red);
+    border: 1px solid rgba(255,77,109,0.3);
+    border-radius: 4px;
+    font-size: 9px;
+    padding: 1px 6px;
+    margin-left: 6px;
+  }
+
+  /* TABS */
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* Summary cards */
+  .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  .summary-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px;
+    text-align: center;
+  }
+  .summary-value { font-family: 'Rajdhani', sans-serif; font-size: 28px; font-weight: 700; }
+  .summary-label { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .sv-hot { color: var(--accent-red); }
+  .sv-warm { color: var(--accent-gold); }
+  .sv-cold { color: var(--accent-blue); }
+  .sv-converted { color: var(--accent-teal); }
+
+  /* Delete btn */
+  .btn-danger {
+    width: 100%;
+    padding: 12px;
+    background: rgba(255,77,109,0.1);
+    border: 1px solid rgba(255,77,109,0.3);
+    border-radius: 12px;
+    color: var(--accent-red);
+    font-size: 14px;
+    cursor: pointer;
+    margin-top: 8px;
+    font-family: 'Noto Sans Devanagari', sans-serif;
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="app-header">
+  <div class="app-logo">
+    <div class="logo-icon">🏠</div>
+    <div>
+      <div class="app-title-text">RE DIARY</div>
+      <div class="app-subtitle">Real Estate Lead Manager</div>
+    </div>
+  </div>
+  <div class="header-actions">
+    <button class="icon-btn" onclick="openSearch()" title="Search">🔍</button>
+    <button class="icon-btn" id="exportBtn" onclick="exportData()" title="Export">📤</button>
+  </div>
+</div>
+
+<!-- STATS BAR -->
+<div class="stats-bar" id="statsBar">
+  <div class="stat-item">
+    <div class="stat-num" id="statTotal">0</div>
+    <div class="stat-label">कुल Leads</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num" id="statHot" style="color: var(--accent-red)">0</div>
+    <div class="stat-label">Hot 🔥</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num" id="statWarm" style="color: var(--accent-gold)">0</div>
+    <div class="stat-label">Warm ⭐</div>
+  </div>
+  <div class="stat-item">
+    <div class="stat-num" id="statConverted" style="color: var(--accent-teal)">0</div>
+    <div class="stat-label">Convert ✅</div>
+  </div>
+</div>
+
+<!-- TAB NAV -->
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="switchTab('leads', this)">
+    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    सभी Leads
+  </button>
+  <button class="tab-btn" onclick="switchTab('followup', this)">
+    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    Follow-Up
+  </button>
+  <button class="tab-btn" onclick="switchTab('summary', this)">
+    <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+    Summary
+  </button>
+</div>
+
+<!-- MAIN CONTENT -->
+<div class="main-content">
+
+  <!-- INSTALL BANNER -->
+  <div class="install-banner" id="installBanner">
+    <span style="font-size:24px">📲</span>
+    <div class="install-text">
+      <strong>App Install करें!</strong>
+      Home Screen पर add करें for notifications
+    </div>
+    <button class="install-btn" id="installBtnEl" onclick="installApp()">Install</button>
+  </div>
+
+  <!-- TAB: LEADS -->
+  <div class="tab-content active" id="tab-leads">
+    <div class="search-bar">
+      <span class="search-icon">🔍</span>
+      <input type="text" id="searchInput" placeholder="नाम, मोबाइल, प्रोजेक्ट खोजें..." oninput="renderLeads()">
+    </div>
+    <div class="filter-chips">
+      <div class="chip active" onclick="setFilter('all', this)">सभी</div>
+      <div class="chip" onclick="setFilter('hot', this)">🔥 Hot</div>
+      <div class="chip" onclick="setFilter('warm', this)">⭐ Warm</div>
+      <div class="chip" onclick="setFilter('cold', this)">❄️ Cold</div>
+      <div class="chip" onclick="setFilter('converted', this)">✅ Converted</div>
+      <div class="chip" onclick="setFilter('RERA Estate', this)">RERA Estate</div>
+      <div class="chip" onclick="setFilter('Imperial Estate', this)">Imperial Estate</div>
+    </div>
+    <div id="leadsContainer"></div>
+  </div>
+
+  <!-- TAB: FOLLOW-UP -->
+  <div class="tab-content" id="tab-followup">
+    <p class="section-title">📅 आने वाले Follow-Ups</p>
+    <div id="followupContainer"></div>
+  </div>
+
+  <!-- TAB: SUMMARY -->
+  <div class="tab-content" id="tab-summary">
+    <p class="section-title">📊 Sales Summary</p>
+    <div class="summary-grid">
+      <div class="summary-card">
+        <div class="summary-value sv-hot" id="sumHot">0</div>
+        <div class="summary-label">🔥 Hot Leads</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-value sv-warm" id="sumWarm">0</div>
+        <div class="summary-label">⭐ Warm Leads</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-value sv-cold" id="sumCold">0</div>
+        <div class="summary-label">❄️ Cold Leads</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-value sv-converted" id="sumConverted">0</div>
+        <div class="summary-label">✅ Converted</div>
+      </div>
+    </div>
+    <p class="section-title">🏗️ Project-wise Leads</p>
+    <div id="projectSummary"></div>
+    <p class="section-title" style="margin-top:16px">⏰ Overdue Follow-Ups</p>
+    <div id="overdueContainer"></div>
+  </div>
+
+</div>
+
+<!-- FAB -->
+<button class="fab" onclick="openAddModal()">+</button>
+
+<!-- ADD/EDIT LEAD MODAL -->
+<div class="modal-overlay" id="leadModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title" id="modalTitle">➕ नया Lead जोड़ें</div>
+
+    <div class="form-group">
+      <label class="form-label">👤 नाम *</label>
+      <input class="form-input" id="fName" type="text" placeholder="Lead का नाम">
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">📱 मोबाइल नंबर *</label>
+        <input class="form-input" id="fPhone" type="tel" placeholder="9876543210">
+      </div>
+      <div class="form-group">
+        <label class="form-label">🏙️ एरिया</label>
+        <input class="form-input" id="fArea" type="text" placeholder="Ajmer Road...">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">🏗️ Project *</label>
+      <select class="form-select" id="fProject">
+        <option value="">-- Project चुनें --</option>
+        <option value="RERA Estate">RERA Estate</option>
+        <option value="Imperial Estate">Imperial Estate</option>
+        <option value="Other">Other</option>
+      </select>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">🌡️ Status</label>
+        <select class="form-select" id="fStatus">
+          <option value="warm">⭐ Warm</option>
+          <option value="hot">🔥 Hot</option>
+          <option value="cold">❄️ Cold</option>
+          <option value="converted">✅ Converted</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">📣 Source</label>
+        <select class="form-select" id="fSource">
+          <option value="Meta Ads">Meta Ads</option>
+          <option value="WhatsApp">WhatsApp</option>
+          <option value="Referral">Referral</option>
+          <option value="Cold Call">Cold Call</option>
+          <option value="Site Visit">Site Visit</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">💬 Last बात क्या हुई</label>
+      <textarea class="form-textarea" id="fLastTalk" placeholder="पिछली बातचीत का सारांश..."></textarea>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">📅 Next Follow-Up Date</label>
+        <input class="form-input" id="fNextDate" type="date">
+      </div>
+      <div class="form-group">
+        <label class="form-label">⏰ Follow-Up Time</label>
+        <input class="form-input" id="fNextTime" type="time">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">📝 Follow-Up Topic / Reminder</label>
+      <input class="form-input" id="fNextNote" type="text" placeholder="Call करके plot details share करें...">
+    </div>
+
+    <button class="btn-primary" id="saveLeadBtn" onclick="saveLead()">💾 Save & Calendar में जोड़ें</button>
+    <button class="btn-secondary" onclick="closeModal()">रद्द करें</button>
+    <button class="btn-danger" id="deleteLeadBtn" style="display:none" onclick="deleteLead()">🗑️ Lead Delete करें</button>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ==================== DATA LAYER ====================
+let leads = JSON.parse(localStorage.getItem('re_leads') || '[]');
+let editingId = null;
+let currentFilter = 'all';
+let deferredPrompt = null;
+
+function saveData() {
+  localStorage.setItem('re_leads', JSON.stringify(leads));
+}
+
+function generateId() {
+  return Date.now().toString(36) + Math.random().toString(36).substr(2);
+}
+
+// ==================== STATS ====================
+function updateStats() {
+  const total = leads.length;
+  const hot = leads.filter(l => l.status === 'hot').length;
+  const warm = leads.filter(l => l.status === 'warm').length;
+  const converted = leads.filter(l => l.status === 'converted').length;
+
+  document.getElementById('statTotal').textContent = total;
+  document.getElementById('statHot').textContent = hot;
+  document.getElementById('statWarm').textContent = warm;
+  document.getElementById('statConverted').textContent = converted;
+
+  document.getElementById('sumHot').textContent = hot;
+  document.getElementById('sumWarm').textContent = warm;
+  document.getElementById('sumCold').textContent = leads.filter(l => l.status === 'cold').length;
+  document.getElementById('sumConverted').textContent = converted;
+
+  // Project summary
+  const projects = {};
+  leads.forEach(l => {
+    const p = l.project || 'Other';
+    projects[p] = (projects[p] || 0) + 1;
+  });
+  const ps = document.getElementById('projectSummary');
+  ps.innerHTML = Object.entries(projects).map(([k, v]) => `
+    <div class="followup-item" style="margin-bottom:8px">
+      <div class="followup-date-box" style="min-width:46px; height:46px">
+        <div class="followup-day">${v}</div>
+        <div class="followup-month">Leads</div>
+      </div>
+      <div class="followup-info">
+        <div class="followup-name">${k}</div>
+        <div class="followup-note">${Math.round(v/leads.length*100)||0}% of total leads</div>
+      </div>
+    </div>
+  `).join('') || '<div class="empty-state"><div class="empty-icon">📊</div><div class="empty-sub">अभी कोई lead नहीं</div></div>';
+}
+
+// ==================== RENDER LEADS ====================
+function setFilter(f, el) {
+  currentFilter = f;
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  renderLeads();
+}
+
+function renderLeads() {
+  const q = (document.getElementById('searchInput').value || '').toLowerCase();
+  let filtered = leads.filter(l => {
+    const matchFilter = currentFilter === 'all'
+      ? true
+      : l.status === currentFilter || l.project === currentFilter;
+    const matchSearch = !q || l.name.toLowerCase().includes(q) || l.phone.includes(q) || (l.project||'').toLowerCase().includes(q) || (l.area||'').toLowerCase().includes(q);
+    return matchFilter && matchSearch;
+  }).sort((a, b) => {
+    const order = { hot: 0, warm: 1, cold: 2, converted: 3 };
+    return (order[a.status] || 2) - (order[b.status] || 2);
+  });
+
+  const c = document.getElementById('leadsContainer');
+  if (!filtered.length) {
+    c.innerHTML = `<div class="empty-state">
+      <div class="empty-icon">📋</div>
+      <div class="empty-title">कोई Lead नहीं मिला</div>
+      <div class="empty-sub">+ button से नया lead जोड़ें</div>
+    </div>`;
+    return;
+  }
+
+  const today = new Date().toDateString();
+  c.innerHTML = filtered.map(l => {
+    const isOverdue = l.nextDate && new Date(l.nextDate) < new Date() && l.status !== 'converted';
+    const lastDate = l.lastUpdated ? new Date(l.lastUpdated).toLocaleDateString('hi-IN') : '—';
+    return `
+      <div class="lead-card status-${l.status}" onclick="editLead('${l.id}')">
+        <div class="lead-top">
+          <div>
+            <div class="lead-name">${l.name}</div>
+            <div class="lead-phone">📱 ${l.phone}</div>
+          </div>
+          <span class="status-badge badge-${l.status}">${l.status === 'hot' ? '🔥 Hot' : l.status === 'warm' ? '⭐ Warm' : l.status === 'cold' ? '❄️ Cold' : '✅ Converted'}</span>
+        </div>
+        ${l.project ? `<div class="lead-project">🏗️ ${l.project}</div>` : ''}
+        <div class="lead-meta">
+          <div class="meta-item"><span class="meta-icon">📍</span>${l.area || '—'}</div>
+          <div class="meta-item"><span class="meta-icon">📣</span>${l.source || '—'}</div>
+          <div class="meta-item"><span class="meta-icon">📅</span>Last: ${lastDate}</div>
+          <div class="meta-item"><span class="meta-icon">⏰</span>Next: ${l.nextDate ? formatDate(l.nextDate) : '—'}${isOverdue ? '<span class="overdue-badge">Overdue!</span>' : ''}</div>
+        </div>
+        ${l.lastTalk ? `<div class="lead-notes">💬 ${l.lastTalk}</div>` : ''}
+        <div class="lead-actions" onclick="event.stopPropagation()">
+          <button class="action-btn call" onclick="callLead('${l.phone}')">📞 Call</button>
+          <button class="action-btn whatsapp" onclick="waLead('${l.phone}', '${l.project}')">💬 WA</button>
+          ${l.nextDate ? `<button class="action-btn calendar" onclick="addToCalendar('${l.id}')">📅 Cal</button>` : ''}
+          <button class="action-btn edit" onclick="editLead('${l.id}')">✏️ Edit</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ==================== FOLLOW-UP ====================
+function renderFollowups() {
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const upcoming = leads
+    .filter(l => l.nextDate && new Date(l.nextDate) >= today && l.status !== 'converted')
+    .sort((a,b) => new Date(a.nextDate) - new Date(b.nextDate));
+
+  const overdue = leads
+    .filter(l => l.nextDate && new Date(l.nextDate) < today && l.status !== 'converted')
+    .sort((a,b) => new Date(b.nextDate) - new Date(a.nextDate));
+
+  const c = document.getElementById('followupContainer');
+  if (!upcoming.length) {
+    c.innerHTML = `<div class="empty-state"><div class="empty-icon">📅</div><div class="empty-title">कोई Follow-Up नहीं</div><div class="empty-sub">Lead add करते समय next follow-up date set करें</div></div>`;
+  } else {
+    c.innerHTML = upcoming.map(l => {
+      const d = new Date(l.nextDate);
+      const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      return `
+        <div class="followup-item">
+          <div class="followup-date-box">
+            <div class="followup-day">${d.getDate()}</div>
+            <div class="followup-month">${months[d.getMonth()]}</div>
+          </div>
+          <div class="followup-info">
+            <div class="followup-name">${l.name} <span style="font-size:10px;color:var(--text-muted)">${l.phone}</span></div>
+            <div class="followup-time">⏰ ${l.nextTime || 'Time not set'} &nbsp;|&nbsp; 🏗️ ${l.project || '—'}</div>
+            <div class="followup-note">${l.nextNote || l.lastTalk || '—'}</div>
+          </div>
+          <button class="add-cal-btn" onclick="addToCalendar('${l.id}')">📅 Cal</button>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // Overdue
+  const od = document.getElementById('overdueContainer');
+  if (!overdue.length) {
+    od.innerHTML = '<p style="font-size:12px;color:var(--text-muted);text-align:center">✅ कोई overdue follow-up नहीं</p>';
+  } else {
+    od.innerHTML = overdue.map(l => {
+      const d = new Date(l.nextDate);
+      return `
+        <div class="followup-item" style="border-color: rgba(255,77,109,0.3)">
+          <div class="followup-date-box" style="border-color:rgba(255,77,109,0.3)">
+            <div class="followup-day" style="color:var(--accent-red)">${d.getDate()}</div>
+            <div class="followup-month">${d.toLocaleString('default',{month:'short'})}</div>
+          </div>
+          <div class="followup-info">
+            <div class="followup-name">${l.name} <span class="overdue-badge">Overdue!</span></div>
+            <div class="followup-time" style="color:var(--accent-red)">📞 ${l.phone}</div>
+            <div class="followup-note">${l.nextNote || '—'}</div>
+          </div>
+          <button class="action-btn call" style="padding:6px 10px" onclick="callLead('${l.phone}')">📞</button>
+        </div>
+      `;
+    }).join('');
+  }
+}
+
+// ==================== GOOGLE CALENDAR ====================
+function addToCalendar(id) {
+  const lead = leads.find(l => l.id === id);
+  if (!lead || !lead.nextDate) { showToast('⚠️ Follow-up date set करें पहले'); return; }
+
+  const title = encodeURIComponent(`Follow-Up: ${lead.name} (${lead.project || 'RE'})`);
+  const detail = encodeURIComponent(`Lead: ${lead.name}\nPhone: ${lead.phone}\nProject: ${lead.project || '—'}\nStatus: ${lead.status}\nNote: ${lead.nextNote || lead.lastTalk || '—'}\n\nAdded via RE Diary App`);
+  const location = encodeURIComponent(`Jaipur, Rajasthan`);
+
+  // Format date
+  const dateParts = lead.nextDate.split('-');
+  const timeParts = (lead.nextTime || '10:00').split(':');
+  const startDT = `${dateParts[0]}${dateParts[1]}${dateParts[2]}T${timeParts[0]}${timeParts[1]}00`;
+
+  // End time = start + 30 min
+  const startDate = new Date(lead.nextDate + 'T' + (lead.nextTime || '10:00'));
+  const endDate = new Date(startDate.getTime() + 30 * 60000);
+  const endDT = endDate.toISOString().replace(/[-:]/g,'').split('.')[0];
+
+  const calUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${startDT}/${endDT}&details=${detail}&location=${location}`;
+
+  window.open(calUrl, '_blank');
+  showToast('✅ Google Calendar खुल रहा है!', 'success');
+}
+
+// ==================== MODAL ====================
+function openAddModal() {
+  editingId = null;
+  document.getElementById('modalTitle').textContent = '➕ नया Lead जोड़ें';
+  document.getElementById('deleteLeadBtn').style.display = 'none';
+  clearForm();
+  // Set default date to tomorrow
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  document.getElementById('fNextDate').value = tomorrow.toISOString().split('T')[0];
+  document.getElementById('fNextTime').value = '10:00';
+  document.getElementById('leadModal').classList.add('active');
+}
+
+function editLead(id) {
+  const lead = leads.find(l => l.id === id);
+  if (!lead) return;
+  editingId = id;
+  document.getElementById('modalTitle').textContent = '✏️ Lead Edit करें';
+  document.getElementById('deleteLeadBtn').style.display = 'block';
+  document.getElementById('fName').value = lead.name || '';
+  document.getElementById('fPhone').value = lead.phone || '';
+  document.getElementById('fArea').value = lead.area || '';
+  document.getElementById('fProject').value = lead.project || '';
+  document.getElementById('fStatus').value = lead.status || 'warm';
+  document.getElementById('fSource').value = lead.source || 'Meta Ads';
+  document.getElementById('fLastTalk').value = lead.lastTalk || '';
+  document.getElementById('fNextDate').value = lead.nextDate || '';
+  document.getElementById('fNextTime').value = lead.nextTime || '';
+  document.getElementById('fNextNote').value = lead.nextNote || '';
+  document.getElementById('leadModal').classList.add('active');
+}
+
+function closeModal() {
+  document.getElementById('leadModal').classList.remove('active');
+}
+
+function clearForm() {
+  ['fName','fPhone','fArea','fLastTalk','fNextDate','fNextTime','fNextNote'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('fProject').value = '';
+  document.getElementById('fStatus').value = 'warm';
+  document.getElementById('fSource').value = 'Meta Ads';
+}
+
+// ==================== SAVE LEAD ====================
+function saveLead() {
+  const name = document.getElementById('fName').value.trim();
+  const phone = document.getElementById('fPhone').value.trim();
+  if (!name || !phone) { showToast('⚠️ नाम और मोबाइल नंबर ज़रूरी है!'); return; }
+
+  const leadData = {
+    name,
+    phone,
+    area: document.getElementById('fArea').value.trim(),
+    project: document.getElementById('fProject').value,
+    status: document.getElementById('fStatus').value,
+    source: document.getElementById('fSource').value,
+    lastTalk: document.getElementById('fLastTalk').value.trim(),
+    nextDate: document.getElementById('fNextDate').value,
+    nextTime: document.getElementById('fNextTime').value,
+    nextNote: document.getElementById('fNextNote').value.trim(),
+    lastUpdated: new Date().toISOString()
+  };
+
+  const hasNextDate = leadData.nextDate;
+
+  if (editingId) {
+    const idx = leads.findIndex(l => l.id === editingId);
+    if (idx !== -1) {
+      leads[idx] = { ...leads[idx], ...leadData };
+    }
+    showToast('✅ Lead update हो गया!', 'success');
+  } else {
+    leadData.id = generateId();
+    leadData.createdAt = new Date().toISOString();
+    leads.unshift(leadData);
+    showToast('✅ Lead save हो गया!', 'success');
+  }
+
+  saveData();
+  renderLeads();
+  renderFollowups();
+  updateStats();
+  closeModal();
+
+  // Auto-open calendar if next date set
+  if (hasNextDate) {
+    setTimeout(() => {
+      const id = editingId || leads[0].id;
+      const msg = confirm('📅 Google Calendar में Follow-Up add करें?');
+      if (msg) addToCalendar(editingId || leads[0].id);
+    }, 500);
+  }
+}
+
+function deleteLead() {
+  if (!editingId) return;
+  if (!confirm('क्या आप सच में इस lead को delete करना चाहते हैं?')) return;
+  leads = leads.filter(l => l.id !== editingId);
+  saveData();
+  renderLeads();
+  renderFollowups();
+  updateStats();
+  closeModal();
+  showToast('🗑️ Lead delete हो गया');
+}
+
+// ==================== ACTIONS ====================
+function callLead(phone) {
+  window.location.href = `tel:${phone}`;
+}
+
+function waLead(phone, project) {
+  const msg = encodeURIComponent(`नमस्ते! मैं ${project || 'RE'} के बारे में आपसे बात करना चाहता था। क्या आप अभी available हैं?`);
+  window.open(`https://wa.me/91${phone}?text=${msg}`, '_blank');
+}
+
+// ==================== EXPORT ====================
+function exportData() {
+  if (!leads.length) { showToast('कोई lead नहीं है export करने के लिए'); return; }
+  let csv = 'नाम,मोबाइल,एरिया,प्रोजेक्ट,Status,Source,Last Talk,Next Follow-Up Date,Next Time,Note\n';
+  leads.forEach(l => {
+    csv += `"${l.name}","${l.phone}","${l.area||''}","${l.project||''}","${l.status}","${l.source||''}","${(l.lastTalk||'').replace(/"/g,"'")}","${l.nextDate||''}","${l.nextTime||''}","${(l.nextNote||'').replace(/"/g,"'")}"\n`;
+  });
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `RE_Leads_${new Date().toLocaleDateString('en-IN').replace(/\//g,'-')}.csv`;
+  a.click();
+  showToast('📊 CSV Export हो गया!', 'success');
+}
+
+// ==================== TABS ====================
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  btn.classList.add('active');
+  if (tab === 'followup') renderFollowups();
+  if (tab === 'summary') updateStats();
+}
+
+// ==================== UTILS ====================
+function formatDate(dateStr) {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('hi-IN', { day: 'numeric', month: 'short' });
+}
+
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast show ${type}`;
+  setTimeout(() => t.className = 'toast', 3000);
+}
+
+function openSearch() {
+  switchTab('leads', document.querySelector('.tab-btn'));
+  document.getElementById('searchInput').focus();
+}
+
+// ==================== PWA INSTALL ====================
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('installBanner').classList.add('visible');
+});
+
+function installApp() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then((r) => {
+      if (r.outcome === 'accepted') showToast('🎉 App install हो गई!', 'success');
+      deferredPrompt = null;
+      document.getElementById('installBanner').classList.remove('visible');
+    });
+  }
+}
+
+// ==================== SAMPLE DATA ====================
+function loadSampleData() {
+  if (leads.length > 0) return;
+  const today = new Date();
+  const tomorrow = new Date(today); tomorrow.setDate(today.getDate() + 1);
+  const nextWeek = new Date(today); nextWeek.setDate(today.getDate() + 3);
+  const yesterday = new Date(today); yesterday.setDate(today.getDate() - 1);
+
+  leads = [
+    {
+      id: generateId(),
+      name: 'Rajesh Sharma',
+      phone: '9876543210',
+      area: 'Ajmer Road',
+      project: 'RERA Estate',
+      status: 'hot',
+      source: 'Meta Ads',
+      lastTalk: 'Plot की location पसंद आई, budget discuss किया ₹25-30L',
+      nextDate: tomorrow.toISOString().split('T')[0],
+      nextTime: '11:00',
+      nextNote: 'Site visit schedule करें',
+      lastUpdated: today.toISOString(),
+      createdAt: today.toISOString()
+    },
+    {
+      id: generateId(),
+      name: 'Priya Verma',
+      phone: '9988776655',
+      area: 'Army Area',
+      project: 'Imperial Estate',
+      status: 'warm',
+      source: 'Referral',
+      lastTalk: 'Husband के साथ आएंगी देखने, weekend prefer करते हैं',
+      nextDate: nextWeek.toISOString().split('T')[0],
+      nextTime: '10:00',
+      nextNote: 'Weekend site visit confirm करें',
+      lastUpdated: today.toISOString(),
+      createdAt: today.toISOString()
+    },
+    {
+      id: generateId(),
+      name: 'Sunil Jain',
+      phone: '9123456789',
+      area: 'Mansarovar',
+      project: 'RERA Estate',
+      status: 'cold',
+      source: 'Cold Call',
+      lastTalk: 'अभी invest करने का plan नहीं, 3 महीने बाद contact करें',
+      nextDate: yesterday.toISOString().split('T')[0],
+      nextTime: '15:00',
+      nextNote: '3 महीने बाद follow-up',
+      lastUpdated: today.toISOString(),
+      createdAt: today.toISOString()
+    },
+    {
+      id: generateId(),
+      name: 'Amit Meena',
+      phone: '9765432100',
+      area: 'Vaishali Nagar',
+      project: 'Imperial Estate',
+      status: 'converted',
+      source: 'WhatsApp',
+      lastTalk: 'Deal close! Plot booking amount ₹1L जमा कर दिया',
+      nextDate: '',
+      nextTime: '',
+      nextNote: 'Agreement process',
+      lastUpdated: today.toISOString(),
+      createdAt: today.toISOString()
+    }
+  ];
+  saveData();
+}
+
+// ==================== SERVICE WORKER ====================
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
+
+// ==================== INIT ====================
+loadSampleData();
+renderLeads();
+updateStats();
+
+// Close modal on outside click
+document.getElementById('leadModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+</script>
+</body>
+</html>
