@@ -169,6 +169,15 @@ body{font-family:'Noto Sans Devanagari','Rajdhani',sans-serif;background:var(--b
 .call-result-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
 .call-connected{background:rgba(0,212,170,.15)}
 .call-missed{background:rgba(255,77,109,.15)}
+.followup-alert-banner{display:none;background:var(--bg-card);border-bottom:1px solid var(--border)}
+.followup-alert-banner.visible{display:block}
+.followup-alert-inner{display:flex;align-items:center}
+.followup-alert-overdue{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:9px 10px;background:rgba(255,77,109,.12);border-right:1px solid var(--border);cursor:pointer;transition:all .2s}
+.followup-alert-overdue:hover{background:rgba(255,77,109,.2)}
+.followup-alert-today{flex:1;display:flex;align-items:center;justify-content:center;gap:8px;padding:9px 10px;background:rgba(212,168,67,.08);cursor:pointer;transition:all .2s}
+.followup-alert-today:hover{background:rgba(212,168,67,.15)}
+.followup-alert-count{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:700;line-height:1}
+.followup-alert-label{font-size:10px;line-height:1.4}
 </style>
 </head>
 <body>
@@ -193,6 +202,26 @@ body{font-family:'Noto Sans Devanagari','Rajdhani',sans-serif;background:var(--b
   <div class="stat-item" onclick="switchTabByName('leads');setFilterByName('warm')"><div class="stat-num" id="statWarm" style="color:var(--accent-gold)">0</div><div class="stat-label">Warm⭐</div></div>
   <div class="stat-item" onclick="switchTabByName('leads');setFilterByName('converted')"><div class="stat-num" id="statConverted" style="color:var(--accent-teal)">0</div><div class="stat-label">Close✅</div></div>
   <div class="stat-item" onclick="switchTabByName('visits')"><div class="stat-num" id="statVisit" style="color:var(--accent-purple)">0</div><div class="stat-label">Visit🏠</div></div>
+</div>
+
+<!-- FOLLOW-UP ALERT BANNER -->
+<div class="followup-alert-banner" id="followupAlertBanner">
+  <div class="followup-alert-inner">
+    <div class="followup-alert-overdue" id="alertOverdueBtn" onclick="switchTab('followup',document.getElementById('tabBtn-followup'))">
+      <div style="font-size:16px">🔴</div>
+      <div>
+        <div class="followup-alert-count" style="color:var(--accent-red)" id="alertOverdueCount">0</div>
+        <div class="followup-alert-label" style="color:var(--accent-red)">Overdue<br><span style="font-size:9px;opacity:.7">tap karein →</span></div>
+      </div>
+    </div>
+    <div class="followup-alert-today" id="alertTodayBtn" onclick="switchTab('followup',document.getElementById('tabBtn-followup'))">
+      <div style="font-size:16px">🟡</div>
+      <div>
+        <div class="followup-alert-count" style="color:var(--accent-gold)" id="alertTodayCount">0</div>
+        <div class="followup-alert-label" style="color:var(--accent-gold)">Aaj ke Follow-Up<br><span style="font-size:9px;opacity:.7">tap karein →</span></div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div class="tab-nav">
@@ -601,6 +630,7 @@ function updateStats(){
       <div class="followup-date-box"><div class="followup-day">${v}</div><div class="followup-month">Leads</div></div>
       <div class="followup-info"><div class="followup-name">${k}</div><div class="followup-note">${t?Math.round(v/t*100):0}% of total</div></div>
     </div>`).join('')||'<div class="empty-state"><div class="empty-icon">📊</div><div class="empty-sub">कोई lead नहीं</div></div>';
+  if(typeof updateFollowupAlertBanner==='function')updateFollowupAlertBanner();
 }
 
 // RENDER LEADS
@@ -1026,6 +1056,66 @@ function checkOtherProject(){
   if(v!=='Other')document.getElementById('fProjectOther').value='';
 }
 
+// DUPLICATE LEAD DETECTOR
+function checkDuplicateLead(phone, currentId){
+  const cleanPhone=phone.replace(/\s+/g,'').replace(/^(\+91|91)/,'');
+  return leads.find(l=>{
+    if(currentId&&l.id===currentId)return false;
+    const lp=(l.phone||'').replace(/\s+/g,'').replace(/^(\+91|91)/,'');
+    return lp===cleanPhone;
+  })||null;
+}
+function showDuplicateWarning(dup,onContinue){
+  const sl={hot:'🔥 Hot',warm:'⭐ Warm',cold:'❄️ Cold',converted:'✅ Converted'};
+  const added=dup.createdAt?new Date(dup.createdAt).toLocaleDateString('hi-IN'):'—';
+  const el=document.createElement('div');
+  el.id='dupWarnOverlay';
+  el.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:999;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px)';
+  el.innerHTML=`<div style="background:var(--bg-card);border:1px solid rgba(255,77,109,.4);border-radius:20px;padding:22px 18px;width:100%;max-width:360px;animation:slideUp .25s ease">
+    <div style="text-align:center;margin-bottom:16px">
+      <div style="font-size:36px;margin-bottom:6px">⚠️</div>
+      <div style="font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:700;color:var(--accent-red)">Duplicate Number!</div>
+      <div style="font-size:12px;color:var(--text-secondary);margin-top:3px">यह नंबर पहले से save है</div>
+    </div>
+    <div style="background:rgba(255,77,109,.08);border:1px solid rgba(255,77,109,.25);border-radius:12px;padding:14px;margin-bottom:16px">
+      <div style="font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:700;color:var(--text-primary);margin-bottom:8px">👤 ${dup.name}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;font-size:12px;color:var(--text-secondary)">
+        <div>📱 ${dup.phone}</div><div>${sl[dup.status]||dup.status}</div>
+        <div>🏗️ ${dup.project||'—'}</div><div>📅 ${added}</div>
+      </div>
+      ${dup.nextDate?`<div style="margin-top:8px;font-size:11px;color:var(--accent-gold);background:rgba(212,168,67,.1);border-radius:6px;padding:5px 8px">⏰ Follow-up: ${formatDate(dup.nextDate)}</div>`:''}
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <button onclick="document.getElementById('dupWarnOverlay').remove();closeModal();editLead('${dup.id}')" style="padding:12px 6px;background:rgba(212,168,67,.15);border:1px solid rgba(212,168,67,.4);border-radius:12px;color:var(--accent-gold);font-size:12px;font-weight:600;cursor:pointer;font-family:'Noto Sans Devanagari',sans-serif">✏️ Wahi Lead<br>Edit Karein</button>
+      <button onclick="document.getElementById('dupWarnOverlay').remove();(${onContinue})()" style="padding:12px 6px;background:rgba(255,77,109,.1);border:1px solid rgba(255,77,109,.3);border-radius:12px;color:var(--accent-red);font-size:12px;font-weight:600;cursor:pointer;font-family:'Noto Sans Devanagari',sans-serif">⚠️ Phir Bhi<br>Add Karein</button>
+    </div>
+    <button onclick="document.getElementById('dupWarnOverlay').remove()" style="width:100%;margin-top:8px;padding:10px;background:transparent;border:1px solid var(--border);border-radius:10px;color:var(--text-secondary);font-size:13px;cursor:pointer;font-family:'Noto Sans Devanagari',sans-serif">रद्द करें — Wapas Jao</button>
+  </div>`;
+  document.body.appendChild(el);
+}
+
+// FOLLOW-UP ALERT BANNER UPDATE
+function updateFollowupAlertBanner(){
+  const today=new Date();today.setHours(0,0,0,0);
+  const tomorrow=new Date(today);tomorrow.setDate(tomorrow.getDate()+1);
+  let oc=0,tc=0;
+  leads.forEach(l=>{
+    if(!l.nextDate||l.status==='converted')return;
+    const d=new Date(l.nextDate);d.setHours(0,0,0,0);
+    if(d<today)oc++;
+    else if(d<tomorrow)tc++;
+  });
+  document.getElementById('alertOverdueCount').textContent=oc;
+  document.getElementById('alertTodayCount').textContent=tc;
+  const banner=document.getElementById('followupAlertBanner');
+  const ob=document.getElementById('alertOverdueBtn');
+  const tb=document.getElementById('alertTodayBtn');
+  if(oc>0||tc>0)banner.classList.add('visible');
+  else banner.classList.remove('visible');
+  ob.style.display=oc>0?'flex':'none';
+  tb.style.display=tc>0?'flex':'none';
+}
+
 // SAVE LEAD
 function saveLead(){
   const name=document.getElementById('fName').value.trim();
@@ -1035,6 +1125,20 @@ function saveLead(){
   if(project==='Other') project=document.getElementById('fProjectOther').value.trim()||'Other';
   const ld={name,phone,area:document.getElementById('fArea').value.trim(),project,status:document.getElementById('fStatus').value,source:document.getElementById('fSource').value,lastTalk:document.getElementById('fLastTalk').value.trim(),nextDate:document.getElementById('fNextDate').value,nextTime:document.getElementById('fNextTime').value,nextNote:document.getElementById('fNextNote').value.trim(),lastUpdated:new Date().toISOString()};
   const hnd=ld.nextDate;
+
+  if(!editingId){
+    const dup=checkDuplicateLead(phone,null);
+    if(dup){
+      showDuplicateWarning(dup,function(){
+        ld.id=generateId();ld.createdAt=new Date().toISOString();leads.unshift(ld);
+        saveData();renderLeads();renderFollowups();updateStats();closeModal();
+        showToast('✅ Lead save ho gaya!','success');
+        if(hnd){setTimeout(()=>{if(confirm('📅 Google Calendar mein Follow-Up add karen?'))addToCalendar(leads[0].id);},500);}
+      });
+      return;
+    }
+  }
+
   if(editingId){
     const idx=leads.findIndex(l=>l.id===editingId);
     if(idx!==-1)leads[idx]={...leads[idx],...ld};
