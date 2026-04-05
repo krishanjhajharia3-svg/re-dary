@@ -725,6 +725,7 @@ function renderVisits(){
         <button class="action-btn whatsapp" onclick="waLead('${l.phone}','${(l.project||'').replace(/'/g,'`')}')">💬 WA</button>
         <button class="action-btn savecon" onclick="openContactModal('${l.id}')">📱 Save</button>
         <button class="action-btn edit" onclick="editLead('${l.id}')">✏️ Edit</button>
+        <button class="action-btn" style="border-color:rgba(255,77,109,.3);color:var(--accent-red)" onclick="removeVisit('${l.id}')">❌ Remove</button>
       </div>
     </div>`).join('');
 }
@@ -986,6 +987,23 @@ async function saveVisit(){
   selectedPhotos=[];
 }
 function closeVisitModal(){document.getElementById('visitModal').classList.remove('active');visitingId=null;selectedPhotos=[];}
+function removeVisit(id){
+  if(confirm('क्या आप visit delete करना चाहते हैं?')){
+    const idx=leads.findIndex(l=>l.id===id);
+    if(idx!==-1){
+      leads[idx].visited=false;
+      leads[idx].visitDate=null;
+      leads[idx].visitNotes=null;
+      leads[idx].visitPhotos=null;
+      leads[idx].visitPhotosLocal=null;
+      saveData();
+      renderLeads();
+      renderVisits();
+      updateStats();
+      showToast('Visit delete ho gaya!','success');
+    }
+  }
+}
 
 // CONTACT MODAL
 function openContactModal(id){
