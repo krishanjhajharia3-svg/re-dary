@@ -630,9 +630,9 @@ function updateStats(){
   const proj={};
   leads.forEach(l=>{const p=l.project||'Other';proj[p]=(proj[p]||0)+1});
   document.getElementById('projectSummary').innerHTML=Object.entries(proj).map(([k,v])=>`
-    <div class="followup-item">
+    <div class="followup-item" onclick="switchTabByName('leads');setFilterByName('${k}')" style="cursor:pointer">
       <div class="followup-date-box"><div class="followup-day">${v}</div><div class="followup-month">Leads</div></div>
-      <div class="followup-info"><div class="followup-name">${k}</div><div class="followup-note">${t?Math.round(v/t*100):0}% of total</div></div>
+      <div class="followup-info"><div class="followup-name">${k}</div><div class="followup-note">${t?Math.round(v/t*100):0}% of total - Tap to filter</div></div>
     </div>`).join('')||'<div class="empty-state"><div class="empty-icon">📊</div><div class="empty-sub">कोई lead नहीं</div></div>';
 }
 
