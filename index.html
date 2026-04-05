@@ -48,7 +48,7 @@ body{font-family:'Noto Sans Devanagari','Rajdhani',sans-serif;background:var(--b
 .bottom-nav-icon{font-size:20px;line-height:1}
 .bottom-nav-label{font-size:9px;font-family:'Noto Sans Devanagari',sans-serif;font-weight:500}
 .fab{position:fixed;bottom:80px;right:20px}
-.main-content{padding:14px;padding-bottom:90px}
+.main-content{padding:14px;padding-bottom:110px}
 .section-title{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;color:var(--accent-gold-light);margin-bottom:14px;display:flex;align-items:center;gap:8px}
 .section-title::after{content:'';flex:1;height:1px;background:linear-gradient(to right,var(--border),transparent)}
 .lead-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:13px;margin-bottom:11px;position:relative;overflow:hidden;transition:all .2s;cursor:pointer}
@@ -584,6 +584,9 @@ body{font-family:'Noto Sans Devanagari','Rajdhani',sans-serif;background:var(--b
     <div style="font-size:11px;color:var(--text-muted);text-align:center;margin-bottom:12px" id="driveBackupTime">—</div>
     <button class="btn-primary" onclick="driveRestore();closeExportModal()" style="background:linear-gradient(135deg,#a78bfa,#7c3aed);margin-bottom:6px">🔄 Drive se Restore Karen</button>
     <div style="font-size:11px;color:var(--text-muted);text-align:center;margin-bottom:12px">Purana data wapas lao</div>
+    <hr style="border:none;border-top:1px solid var(--border);margin:16px 0">
+    <button class="btn-danger" onclick="clearAllData();closeExportModal()">🗑️ सारा Data Delete करें</button>
+    <div style="font-size:10px;color:var(--text-muted);text-align:center;margin-top:6px">सभी leads हमेशा के liye delete ho jayenge!</div>
     <button class="btn-secondary" onclick="closeExportModal()">रद्द करें</button>
   </div>
 </div>
@@ -1284,8 +1287,14 @@ function switchTab(tab,btn){
   if(tab==='followup')renderFollowups();
   if(tab==='summary')updateStats();
   if(tab==='visits')renderVisits();
+  updateBottomNav(tab);
 }
 function switchTabByName(tab){switchTab(tab,document.getElementById('tabBtn-'+tab));}
+function updateBottomNav(tab){
+  document.querySelectorAll('.bottom-nav-item').forEach(b=>b.classList.remove('active'));
+  const bn=document.getElementById('bn-'+tab);
+  if(bn)bn.classList.add('active');
+}
 
 function formatDate(ds){if(!ds)return'—';return new Date(ds).toLocaleDateString('hi-IN',{day:'numeric',month:'short'});}
 function showToast(msg,type=''){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast show ${type}`;setTimeout(()=>t.className='toast',3000);}
