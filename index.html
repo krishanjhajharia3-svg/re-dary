@@ -195,6 +195,7 @@ body{font-family:'Noto Sans Devanagari','Rajdhani',sans-serif;background:var(--b
   </div>
   <div class="header-actions">
     <button class="icon-btn" onclick="openSearch()">🔍</button>
+    <button class="icon-btn" onclick="showOverdueAlert()" style="position:relative">🔔<span id="notifBadge" style="display:none;position:absolute;top:-2px;right:-2px;background:var(--accent-red);color:white;font-size:9px;min-width:16px;height:16px;border-radius:50%;align-items:center;justify-content:center;font-weight:700">0</span></button>
     <button class="icon-btn" onclick="showExportOptions()">📤</button>
   </div>
 </div>
@@ -1704,7 +1705,30 @@ window.addEventListener('load', () => {
 
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 
+// NOTIFICATION CHECK
+function checkNotifications(){
+  const today=new Date().toISOString().split('T')[0];
+  const overdue=leads.filter(l=>l.nextDate&&l.nextDate<today&&l.status!=='converted');
+  if(overdue.length>0&&localStorage.getItem('re_notified')!==today){
+    document.getElementById('notifBadge').textContent=overdue.length;
+    document.getElementById('notifBadge').style.display='flex';
+  }
+}
+function showOverdueAlert(){
+  const today=new Date().toISOString().split('T')[0];
+  const overdue=leads.filter(l=>l.nextDate&&l.nextDate<today&&l.status!=='converted');
+  if(overdue.length>0){
+    let msg=`⚠️ ${overdue.length} Follow-ups overdue hain!\n\n`;
+    overdue.slice(0,5).forEach(l=>msg+=`• ${l.name} - ${l.nextDate}\n`);
+    if(overdue.length>5)msg+=`...aur ${overdue.length-5} more`;
+    alert(msg);
+    localStorage.setItem('re_notified',today);
+    document.getElementById('notifBadge').style.display='none';
+  }
+}
+
 // loadSampleData(); // Disabled - sample leads won't appear on first install
+checkNotifications();
 renderLeads();
 updateStats();
 </script>
