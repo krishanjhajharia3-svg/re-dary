@@ -671,6 +671,7 @@ function renderLeads(){
         <div><div class="lead-name">${l.name}</div><div class="lead-phone">📱 ${l.phone}</div></div>
         <span class="status-badge badge-${l.status}">${slabel[l.status]||l.status}</span>
       </div>
+      ${l.nextDate?`<div class="lead-project" style="background:rgba(212,168,67,.15);border-color:rgba(212,168,67,.3);color:var(--accent-gold-light)">📅 Next Follow-Up: ${formatDate(l.nextDate)}${l.nextTime?' '+l.nextTime:''}${isOD?' <span class="overdue-badge">Overdue!</span>':''}</div>`:''}
       ${l.visited?`<div class="visit-tag">🏠 Site Visit किया — ${l.visitDate?formatDate(l.visitDate):''}</div>`:''}
       ${l.project?`<div class="lead-project">🏗️ ${l.project}</div>`:''}
       <div class="lead-meta">
@@ -1246,6 +1247,14 @@ function waLead(phone,project){
 // EXPORT
 function showExportOptions(){document.getElementById('exportModal').classList.add('active');}
 function closeExportModal(){document.getElementById('exportModal').classList.remove('active');}
+function clearAllData(){
+  if(confirm('क्या आप सभी leads delete करना चाहते हैं? यह वापस नहीं किया जा सकता!')){
+    leads=[];
+    saveData();
+    renderLeads();
+    showToast('सारा data delete ho gaya!','success');
+  }
+}
 function exportData(){
   if(!leads.length){showToast('कोई lead नहीं है');return;}
   let csv='नाम,मोबाइल,एरिया,प्रोजेक्ट,Status,Source,Last Talk,Next Date,Next Time,Note,Site Visit,Visit Date,Visit Notes\n';
@@ -1677,7 +1686,7 @@ window.addEventListener('load', () => {
 
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 
-loadSampleData();
+// loadSampleData(); // Disabled - sample leads won't appear on first install
 renderLeads();
 updateStats();
 </script>
