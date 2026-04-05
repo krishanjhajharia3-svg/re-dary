@@ -1205,7 +1205,7 @@ function showCallHistory(id) {
 // END CALL TRACKING
 function waLead(phone,project){
   const msg=encodeURIComponent(`नमस्ते! मैं ${project||'RE'} के बारे में आपसे बात करना चाहता था। क्या आप अभी available हैं?`);
-  window.open(`https://wa.me/91${phone}?text=${msg}`,'_blank');
+  window.location.href=`https://wa.me/91${phone}?text=${msg}`;
 }
 
 // EXPORT
@@ -1239,7 +1239,7 @@ function exportViaWhatsApp(){
     msg+='\n';
   });
   if(leads.length>20)msg+=`... aur ${leads.length-20} leads hain\n`;
-  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank');
+  window.location.href=`https://wa.me/?text=${encodeURIComponent(msg)}`;
 }
 
 // TABS
@@ -1311,25 +1311,10 @@ function initGoogleAuth() {
 }
 
 function googleSignIn() {
-  if (GOOGLE_CLIENT_ID === 'YOUR_GOOGLE_CLIENT_ID_HERE.apps.googleusercontent.com') {
-    showToast('⚠️ Pehle Google Client ID set karein — README dekhen');
-    // Show setup instructions
-    document.getElementById('googleNotLoggedIn').innerHTML = `
-      <div style="background:rgba(255,77,109,.1);border:1px solid rgba(255,77,109,.3);border-radius:10px;padding:12px;font-size:12px;color:var(--text-secondary);line-height:1.8">
-        <strong style="color:var(--accent-red)">⚙️ Setup Required:</strong><br>
-        1. <a href="https://console.cloud.google.com/" target="_blank" style="color:#4285f4">console.cloud.google.com</a> par jayen<br>
-        2. New Project → APIs & Services → Credentials<br>
-        3. OAuth 2.0 Client ID banayein (Web Application)<br>
-        4. index.html mein <code style="color:var(--accent-gold)">GOOGLE_CLIENT_ID</code> replace karein<br>
-        5. File GitHub par update karein
-        <br><br>
-        <strong style="color:var(--accent-gold)">Ya abhi VCF method use karein 👇</strong>
-      </div>
-      <button class="btn-secondary" onclick="switchSaveMethod('vcf')" style="margin-top:10px">📁 VCF File se Save Karen</button>
-    `;
+  if (!tokenClient) {
+    showToast('⚠️ Google library load nahi hui — page refresh karen');
     return;
   }
-  if (!tokenClient) { showToast('⚠️ Google library load nahi hui, refresh karen'); return; }
   tokenClient.requestAccessToken({ prompt: 'consent' });
 }
 
