@@ -1319,7 +1319,7 @@ window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPro
 function installApp(){if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(r=>{if(r.outcome==='accepted')showToast('🎉 App install ho gayi!','success');deferredPrompt=null;document.getElementById('installBanner').classList.remove('visible');});}}
 
 // ===== AI FEATURES =====
-const AI_API_KEY = 'AIzaSyBMK7pPzoZUFhfk5zMMSRpT_mi26FqvfpM';
+const AI_API_KEY = 'AIzaSyBfPXdpEVdak9sw07PBXG_-3F0oEcCsVIQ';
 
 function switchAiSection(id, btn) {
   document.querySelectorAll('.ai-section').forEach(s => s.classList.remove('active'));
@@ -1417,22 +1417,45 @@ function openAiForLead(id) {
 }
 
 const _aiH=[];
+const _models=['gemini-2.0-flash','gemini-1.5-flash','gemini-1.0-pro','gemini-pro'];
+let _workingModel=null;
+
+async function findWorkingModel(){
+  if(_workingModel)return _workingModel;
+  for(const m of _models){
+    try{
+      const r=await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${AI_API_KEY}`,
+        {method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({contents:[{role:'user',parts:[{text:'hi'}]}],generationConfig:{maxOutputTokens:10}})}
+      );
+      if(r.ok){_workingModel=m;return m;}
+    }catch(e){}
+  }
+  throw new Error('Koi bhi model kaam nahi kar raha. API key check karein.');
+}
+
 async function callClaudeAPI(prompt){
-  _aiH.push({role:'user',parts:[{text:prompt}]});
-  const r=await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${AI_API_KEY}`,
-    {method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({
-      system_instruction:{parts:[{text:`Tu ek expert real estate sales assistant hai Jaipur mein. Tu Krishan ke liye kaam karta hai. Projects: Imperial Estate, Imperial Galaxy, Solitair Home, Dream Town, Govind Vihar. Tu WhatsApp messages, lead scoring, objection handling, next actions mein expert hai. Hamesha Hindi ya Hinglish mein jawab de. Har baar alag aur specific jawab de.`}]},
-      contents:_aiH,
-      generationConfig:{maxOutputTokens:900,temperature:0.85}
-    })}
-  );
-  if(!r.ok){const e=await r.text();throw new Error('API error:'+r.status+' '+e);}
-  const d=await r.json();
-  const t=d.candidates?.[0]?.content?.parts?.[0]?.text||null;
-  if(t)_aiH.push({role:'model',parts:[{text:t}]});
-  return t;
+  const systemPrompt = _aiH.length===0 ? 'Tu ek expert real estate sales assistant hai Jaipur mein. Tu Krishan ke liye kaam karta hai. Projects: Imperial Estate, Imperial Galaxy, Solitair Home, Dream Town, Govind Vihar. Hamesha Hindi ya Hinglish mein jawab de. Har baar alag specific jawab de.\n\n' : '';
+  _aiH.push({role:'user',parts:[{text:systemPrompt+prompt}]});
+  try{
+    const model=await findWorkingModel();
+    const r=await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${AI_API_KEY}`,
+      {method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({contents:_aiH,generationConfig:{maxOutputTokens:900,temperature:0.85}})}
+    );
+    if(!r.ok){
+      const e=await r.json();
+      throw new Error('API error: '+r.status+' — '+(e?.error?.message||'Unknown'));
+    }
+    const d=await r.json();
+    const t=d.candidates?.[0]?.content?.parts?.[0]?.text||null;
+    if(t)_aiH.push({role:'model',parts:[{text:t}]});
+    return t;
+  }catch(e){
+    throw new Error(e.message||'API call failed');
+  }
 }
 
 function setAiLoading(btnId, resultId, loading) {
@@ -1493,7 +1516,7 @@ Instructions:
     }
     copyBtn.style.display = 'inline-block';
   } catch(e) {
-    result.textContent = '❌ Error: API call failed. App mein valid API key add karein.';
+    result.textContent = '❌ Error: ' + (e.message || 'Unknown error');
   }
   btn.disabled = false;
   btn.innerHTML = origText;
@@ -1561,7 +1584,7 @@ ANALYSIS: [2-3 lines Hindi mein kyun yeh score diya, kya improve karna chahiye]`
     scoreLabel.style.color = score >= 70 ? '#ff4d6d' : score >= 40 ? '#d4a843' : '#4d9fff';
     document.getElementById('aiScoreText').textContent = analysis;
   } catch(e) {
-    result.innerHTML = '<div style="color:var(--accent-red);padding:10px">❌ Error: API failed. Valid API key add karein.</div>';
+    result.innerHTML = '<div style="color:var(--accent-red);padding:10px">❌ Error: ' + (e.message||'Unknown') + '</div>';
   }
   btn.disabled = false;
   btn.innerHTML = origText;
@@ -1611,7 +1634,7 @@ Suggest karo (Hindi mein, practical aur specific):
     }
     copyBtn.style.display = 'inline-block';
   } catch(e) {
-    result.textContent = '❌ Error: API failed. Valid API key add karein.';
+    result.textContent = '❌ Error: ' + (e.message||'Unknown error');
   }
   btn.disabled = false;
   btn.innerHTML = origText;
@@ -1656,7 +1679,7 @@ Direct speech mein likho jaise agent bol raha ho. 150 words mein raho.`;
     }
     copyBtn.style.display = 'inline-block';
   } catch(e) {
-    result.textContent = '❌ Error: API failed. Valid API key add karein.';
+    result.textContent = '❌ Error: ' + (e.message||'Unknown error');
   }
   btn.disabled = false;
   btn.innerHTML = origText;
