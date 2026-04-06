@@ -1670,17 +1670,24 @@ function showCallHistory(id){
 function waLead(phone,project){
   const msg=encodeURIComponent('नमस्ते! मैं '+(project||'RE')+' के बारे में आपसे बात करना चाहता था। क्या आप अभी available हैं?');
   const waUrl='https://wa.me/91'+phone+'?text='+msg;
-  if(/android/i.test(navigator.userAgent)){
-    const a=document.createElement('a');
-    a.href='whatsapp://send?phone=91'+phone+'&text='+msg;
-    document.body.appendChild(a);a.click();document.body.removeChild(a);
-    setTimeout(function(){window.location.href=waUrl;},1500);
-  } else if(window.Android&&window.Android.openExternal){
-    window.Android.openExternal(waUrl);
-  } else {
-    window.location.href='whatsapp://send?phone=91'+phone+'&text='+msg;
-    setTimeout(function(){window.open(waUrl,'_blank');},1000);
-  }
+  // Invisible anchor tag — history mein save nahi hoga
+  const a=document.createElement('a');
+  a.href='whatsapp://send?phone=91'+phone+'&text='+msg;
+  a.target='_blank';
+  a.rel='noopener noreferrer';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  // Fallback — agar whatsapp:// kaam na kare
+  setTimeout(function(){
+    const b=document.createElement('a');
+    b.href=waUrl;
+    b.target='_blank';
+    b.rel='noopener noreferrer';
+    document.body.appendChild(b);
+    b.click();
+    document.body.removeChild(b);
+  },2000);
 }
 
 function showExportOptions(){document.getElementById('exportModal').classList.add('active');}
@@ -1709,8 +1716,15 @@ function exportViaWhatsApp(){
   leads.slice(0,20).forEach((l,i)=>{msg+=`*${i+1}. ${l.name}* ${ic[l.status]||''}\n📱 ${l.phone} | 🏗️ ${l.project||'—'}\n`;if(l.nextDate)msg+=`📅 Next: ${l.nextDate}\n`;if(l.visited)msg+=`🏠 Site Visit: Kiya\n`;msg+='\n';});
   if(leads.length>20)msg+=`... aur ${leads.length-20} leads hain\n`;
   const waExportUrl='https://wa.me/?text='+encodeURIComponent(msg);
-  window.location.href='whatsapp://send?text='+encodeURIComponent(msg);
-  setTimeout(function(){window.open(waExportUrl,'_blank');},1000);
+  const wa=document.createElement('a');
+  wa.href='whatsapp://send?text='+encodeURIComponent(msg);
+  wa.target='_blank';wa.rel='noopener noreferrer';
+  document.body.appendChild(wa);wa.click();document.body.removeChild(wa);
+  setTimeout(function(){
+    const wb=document.createElement('a');
+    wb.href=waExportUrl;wb.target='_blank';wb.rel='noopener noreferrer';
+    document.body.appendChild(wb);wb.click();document.body.removeChild(wb);
+  },2000);
 }
 
 function switchTab(tab,btn){
