@@ -1669,25 +1669,25 @@ function showCallHistory(id){
 
 function waLead(phone,project){
   const msg=encodeURIComponent('नमस्ते! मैं '+(project||'RE')+' के बारे में आपसे बात करना चाहता था। क्या आप अभी available हैं?');
-  const waUrl='https://wa.me/91'+phone+'?text='+msg;
-  // Invisible anchor tag — history mein save nahi hoga
-  const a=document.createElement('a');
-  a.href='whatsapp://send?phone=91'+phone+'&text='+msg;
-  a.target='_blank';
-  a.rel='noopener noreferrer';
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  // Fallback — agar whatsapp:// kaam na kare
-  setTimeout(function(){
-    const b=document.createElement('a');
-    b.href=waUrl;
-    b.target='_blank';
-    b.rel='noopener noreferrer';
-    document.body.appendChild(b);
-    b.click();
-    document.body.removeChild(b);
-  },2000);
+  // Android Intent — seedha WhatsApp app khulega, browser history mein kuch nahi jayega
+  const intentUrl='intent://send/+91'+phone+'#Intent;scheme=smsto;package=com.whatsapp;S.sms_body='+encodeURIComponent('नमस्ते! मैं '+(project||'RE')+' के बारे में आपसे बात करना चाहता था। क्या आप अभी available हैं?')+';end';
+  const waUrl='whatsapp://send?phone=91'+phone+'&text='+msg;
+  const fallbackUrl='https://wa.me/91'+phone+'?text='+msg;
+  
+  if(/android/i.test(navigator.userAgent)){
+    // Android — Intent use karo
+    try{
+      window.location.replace(intentUrl);
+    }catch(e){
+      window.location.replace(waUrl);
+    }
+  } else if(window.navigator.standalone || window.matchMedia('(display-mode:standalone)').matches){
+    // PWA iOS
+    window.location.replace(waUrl);
+  } else {
+    // Normal browser
+    window.open(fallbackUrl,'_blank','noopener,noreferrer');
+  }
 }
 
 function showExportOptions(){document.getElementById('exportModal').classList.add('active');}
