@@ -15,7 +15,7 @@
 <!-- Firebase SDK -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
   import { getFirestore, doc, setDoc, getDoc, collection, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -36,7 +36,15 @@
   window._fbAuth = auth;
   window._fbDb = db;
   window._fbProvider = provider;
-  window._fbFunctions = { signInWithPopup, onAuthStateChanged, signOut, doc, setDoc, getDoc, collection, getDocs, deleteDoc };
+  
+  // Redirect se wapas aane pe result check karo
+  getRedirectResult(auth).then((result) => {
+    if (result && result.user) {
+      window._fbUser = result.user;
+      window.dispatchEvent(new CustomEvent('fbUserReady', { detail: result.user }));
+    }
+  }).catch((e) => { console.log('Redirect result:', e.code); });
+  window._fbFunctions = { signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut, doc, setDoc, getDoc, collection, getDocs, deleteDoc };
 
   // Auth state listener
   onAuthStateChanged(auth, (user) => {
@@ -1026,10 +1034,6 @@ body{font-family:'Noto Sans Devanagari','Rajdhani',sans-serif;background:var(--b
     <div style="font-size:11px;color:var(--text-muted);text-align:center;margin-bottom:12px">Downloads folder → Excel/Google Sheets mein kholo</div>
     <button class="btn-primary" onclick="exportViaWhatsApp();closeExportModal()" style="background:linear-gradient(135deg,#25d366,#128c7e);margin-bottom:6px">💬 WhatsApp par bhejo</button>
     <div style="font-size:11px;color:var(--text-muted);text-align:center;margin-bottom:12px">Apne aap ko list WhatsApp pe bhejo</div>
-    <button class="btn-primary" onclick="driveBackup();closeExportModal()" style="background:linear-gradient(135deg,#4285f4,#1a73e8);margin-bottom:6px">☁️ Google Drive Backup</button>
-    <div style="font-size:11px;color:var(--text-muted);text-align:center;margin-bottom:12px" id="driveBackupTime">—</div>
-    <button class="btn-primary" onclick="driveRestore();closeExportModal()" style="background:linear-gradient(135deg,#a78bfa,#7c3aed);margin-bottom:6px">🔄 Drive se Restore Karen</button>
-    <div style="font-size:11px;color:var(--text-muted);text-align:center;margin-bottom:12px">Purana data wapas lao</div>
     <!-- FIREBASE CLOUD SYNC -->
     <hr style="border:none;border-top:1px solid rgba(0,212,170,.3);margin:16px 0">
     <div style="font-family:'Rajdhani',sans-serif;font-size:15px;font-weight:700;color:#00d4aa;margin-bottom:10px;display:flex;align-items:center;gap:6px">
@@ -1141,16 +1145,43 @@ function updateFirebaseSyncStatus(msg, type=''){
 
 // Firebase Google Login
 async function firebaseGoogleLogin(){
+  // Loading overlay dikhao
+  showFbLoginOverlay(true);
   try{
     const { signInWithPopup } = window._fbFunctions;
+    // Popup — ek choti window khulegi, app band nahi hoga
+    window._fbProvider.setCustomParameters({ prompt: 'select_account' });
     const result = await signInWithPopup(window._fbAuth, window._fbProvider);
     const user = result.user;
-    showToast(`✅ ${user.displayName} login ho gaya!`,'success');
+    showFbLoginOverlay(false);
+    showToast('✅ ' + (user.displayName||'User') + ' login ho gaya!','success');
     updateFirebaseUI(user);
     await loadFromFirestore();
   }catch(e){
-    if(e.code !== 'auth/popup-closed-by-user') showToast('❌ Login fail: '+e.message);
+    showFbLoginOverlay(false);
+    if(e.code === 'auth/popup-blocked' || e.code === 'auth/cancelled-popup-request'){
+      // Popup block hua — redirect fallback
+      showToast('☁️ Google page pe ja raha hai — wapas aane ke baad auto login hoga...','');
+      setTimeout(async()=>{
+        const { signInWithRedirect } = window._fbFunctions;
+        await signInWithRedirect(window._fbAuth, window._fbProvider);
+      }, 1500);
+    } else if(e.code !== 'auth/popup-closed-by-user'){
+      showToast('❌ Login fail: ' + (e.message||e.code));
+    }
   }
+}
+
+function showFbLoginOverlay(show){
+  let overlay = document.getElementById('fbLoginOverlay');
+  if(!overlay){
+    overlay = document.createElement('div');
+    overlay.id = 'fbLoginOverlay';
+    overlay.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9999;flex-direction:column;align-items:center;justify-content:center;gap:16px';
+    overlay.innerHTML = '<div style="width:48px;height:48px;border:3px solid rgba(0,212,170,0.3);border-top-color:#00d4aa;border-radius:50%;animation:spin 1s linear infinite"></div><div style="color:#fff;font-size:15px;font-family:Noto Sans Devanagari,sans-serif">Google se login ho raha hai...</div><button onclick="showFbLoginOverlay(false)" style="margin-top:8px;padding:10px 24px;border-radius:10px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.1);color:#fff;font-size:14px;cursor:pointer;font-family:Noto Sans Devanagari,sans-serif">← Wapas Jaao</button>';
+    document.body.appendChild(overlay);
+  }
+  overlay.style.display = show ? 'flex' : 'none';
 }
 
 async function firebaseSignOut(){
@@ -1637,8 +1668,19 @@ function showCallHistory(id){
 }
 
 function waLead(phone,project){
-  const msg=encodeURIComponent(`नमस्ते! मैं ${project||'RE'} के बारे में आपसे बात करना चाहता था। क्या आप अभी available हैं?`);
-  window.open(`https://wa.me/91${phone}?text=${msg}`,'_blank');
+  const msg=encodeURIComponent('नमस्ते! मैं '+(project||'RE')+' के बारे में आपसे बात करना चाहता था। क्या आप अभी available हैं?');
+  const waUrl='https://wa.me/91'+phone+'?text='+msg;
+  if(/android/i.test(navigator.userAgent)){
+    const a=document.createElement('a');
+    a.href='whatsapp://send?phone=91'+phone+'&text='+msg;
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    setTimeout(function(){window.location.href=waUrl;},1500);
+  } else if(window.Android&&window.Android.openExternal){
+    window.Android.openExternal(waUrl);
+  } else {
+    window.location.href='whatsapp://send?phone=91'+phone+'&text='+msg;
+    setTimeout(function(){window.open(waUrl,'_blank');},1000);
+  }
 }
 
 function showExportOptions(){document.getElementById('exportModal').classList.add('active');}
@@ -1666,7 +1708,9 @@ function exportViaWhatsApp(){
   const ic={hot:'🔥',warm:'⭐',cold:'❄️',converted:'✅'};
   leads.slice(0,20).forEach((l,i)=>{msg+=`*${i+1}. ${l.name}* ${ic[l.status]||''}\n📱 ${l.phone} | 🏗️ ${l.project||'—'}\n`;if(l.nextDate)msg+=`📅 Next: ${l.nextDate}\n`;if(l.visited)msg+=`🏠 Site Visit: Kiya\n`;msg+='\n';});
   if(leads.length>20)msg+=`... aur ${leads.length-20} leads hain\n`;
-  window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank');
+  const waExportUrl='https://wa.me/?text='+encodeURIComponent(msg);
+  window.location.href='whatsapp://send?text='+encodeURIComponent(msg);
+  setTimeout(function(){window.open(waExportUrl,'_blank');},1000);
 }
 
 function switchTab(tab,btn){
