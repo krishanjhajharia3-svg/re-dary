@@ -1417,45 +1417,67 @@ function openAiForLead(id) {
 }
 
 const _aiH=[];
-const _models=['gemini-2.0-flash','gemini-1.5-flash','gemini-1.0-pro','gemini-pro'];
-let _workingModel=null;
-
-async function findWorkingModel(){
-  if(_workingModel)return _workingModel;
-  for(const m of _models){
-    try{
-      const r=await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${AI_API_KEY}`,
-        {method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({contents:[{role:'user',parts:[{text:'hi'}]}],generationConfig:{maxOutputTokens:10}})}
-      );
-      if(r.ok){_workingModel=m;return m;}
-    }catch(e){}
-  }
-  throw new Error('Koi bhi model kaam nahi kar raha. API key check karein.');
-}
 
 async function callClaudeAPI(prompt){
-  const systemPrompt = _aiH.length===0 ? 'Tu ek expert real estate sales assistant hai Jaipur mein. Tu Krishan ke liye kaam karta hai. Projects: Imperial Estate, Imperial Galaxy, Solitair Home, Dream Town, Govind Vihar. Hamesha Hindi ya Hinglish mein jawab de. Har baar alag specific jawab de.\n\n' : '';
-  _aiH.push({role:'user',parts:[{text:systemPrompt+prompt}]});
-  try{
-    const model=await findWorkingModel();
-    const r=await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${AI_API_KEY}`,
-      {method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({contents:_aiH,generationConfig:{maxOutputTokens:900,temperature:0.85}})}
-    );
-    if(!r.ok){
-      const e=await r.json();
-      throw new Error('API error: '+r.status+' — '+(e?.error?.message||'Unknown'));
+  // Smart demo mode — bilkul free, koi API key nahi chahiye
+  await new Promise(r=>setTimeout(r,1200));
+  
+  const p = prompt.toLowerCase();
+  
+  // WhatsApp Message
+  if(p.includes('whatsapp') || p.includes('message')){
+    const nameM = prompt.match(/naam[:\s]+([^\n,]+)/i)||prompt.match(/lead[:\s]+([^\n,]+)/i);
+    const name = nameM?nameM[1].trim():'Client ji';
+    const projM = prompt.match(/project[:\s]+([^\n,]+)/i);
+    const proj = projM?projM[1].trim():'hamara project';
+    if(p.includes('hot')||p.includes('ready')){
+      return `नमस्ते ${name}! 🙏\n\nआपसे ${proj} के बारे में बात करके बहुत अच्छा लगा। आप plot लेने के लिए तैयार हैं — तो चलिए इस weekend site visit confirm करते हैं!\n\n✅ Limited plots बचे हैं\n✅ Easy payment plan available\n\nCall करें: [your number]\n\nइंतज़ार कर रहा हूँ! 😊`;
+    } else if(p.includes('cold')||p.includes('thinking')){
+      return `नमस्ते ${name} जी! 😊\n\n${proj} में कुछ नए offers आए हैं जो शायद आपको पसंद आएं।\n\n🏠 Prime location — Army Area के पास\n💰 Flexible payment plan\n📈 Investment के लिए बेहतरीन\n\nजब भी time मिले, एक बार जरूर बात करें!\n\nCall: [your number]`;
+    } else {
+      return `नमस्ते ${name} जी! 🏠\n\n${proj} में आपकी interest के लिए शुक्रिया। आज plots की availability limited है।\n\n✅ RERA Approved\n✅ Bank Loan Available  \n✅ Prime Location\n\nक्या हम कल एक छोटी site visit schedule कर सकते हैं?\n\nCall करें: [your number] 📞`;
     }
-    const d=await r.json();
-    const t=d.candidates?.[0]?.content?.parts?.[0]?.text||null;
-    if(t)_aiH.push({role:'model',parts:[{text:t}]});
-    return t;
-  }catch(e){
-    throw new Error(e.message||'API call failed');
   }
+  
+  // Lead Score
+  if(p.includes('score')||p.includes('analyze')||p.includes('analysis')){
+    let score=50;
+    if(p.includes('referral'))score+=20;
+    if(p.includes('site visit')||p.includes('visit हो'))score+=25;
+    if(p.includes('ready')||p.includes('hot'))score+=20;
+    if(p.includes('नहीं उठाता')||p.includes('cold'))score-=20;
+    if(p.includes('महीने'))score-=15;
+    score=Math.min(92,Math.max(15,score));
+    const lbl=score>=70?'🔥 Hot':score>=40?'⭐ Warm':'❄️ Cold';
+    return `SCORE: ${score}\nLABEL: ${score>=70?'Hot':score>=40?'Warm':'Cold'}\nANALYSIS: यह lead ${lbl} category में है। ${score>=70?'जल्दी से follow-up करें और deal close करने की कोशिश करें। Site visit हो चुकी है तो closing के लिए अच्छा मौका है।':score>=40?'थोड़ी और nurturing की जरूरत है। Budget clear करें और site visit schedule करें। Regular follow-up जारी रखें।':'अभी यह lead warm नहीं है। हफ्ते में एक बार follow-up करते रहें। जब situation बदले तो actively engage करें।'}`;
+  }
+  
+  // Next Action
+  if(p.includes('action')||p.includes('aaj')||p.includes('kya karein')||p.includes('next')){
+    const nameA=prompt.match(/lead[:\s]+([^\n,]+)/i)||prompt.match(/naam[:\s]+([^\n,]+)/i);
+    const nm=nameA?nameA[1].trim():'Lead';
+    if(p.includes('family')||p.includes('approval')){
+      return `🎯 Aaj Ka Action:\n${nm} ji ko call karein aur family meeting ke liye invite karein — site par aakar khud dekhen.\n\n💬 Kya Bolna Hai:\n• "Sir, aap akele kyun tension lein — ek baar ghar waalon ko saath lekar aayein"\n• "Hum sab ko personally tour deenge aur saari details clear karenge"\n• "Koi pressure nahi — bas ek informal visit"\n\n⏰ Follow-up Timing:\n2 din baad — agar response nahi aaya toh WhatsApp message bhejein\n\n📊 Conversion Probability:\n60% — Family involvement se deal close hone ke chances badh jaate hain`;
+    } else if(p.includes('budget')||p.includes('price')){
+      return `🎯 Aaj Ka Action:\n${nm} ji ko payment plan ki details bhejein WhatsApp par — EMI options clearly samjhaayein.\n\n💬 Kya Bolna Hai:\n• "Sir, sirf 20% down payment mein booking ho jaati hai"\n• "Baaki amount easy installments mein — bank loan bhi available hai"\n• "Ek baar calculate karke dekhein — monthly burden bahut kam hai"\n\n⏰ Follow-up Timing:\nAaj shaam tak WhatsApp karo, kal subah call karo\n\n📊 Conversion Probability:\n65% — Budget objection handle hone ke baad deal close ho sakti hai`;
+    } else {
+      return `🎯 Aaj Ka Action:\n${nm} ji ko call karein aur site visit schedule karein — personally dekhna sabse bada converting factor hai.\n\n💬 Kya Bolna Hai:\n• "Sir, sirf ek baar plot dekhne aayein — koi commitment nahi"\n• "Location dekh ke aap khud decide kar lenge"\n• "Is weekend free hain? Main personally tour dunga"\n\n⏰ Follow-up Timing:\nAaj call karo — kal tak visit confirm karein\n\n📊 Conversion Probability:\n70% — Site visit ke baad conversion rate bahut badh jaati hai`;
+    }
+  }
+  
+  // Objection Handler
+  if(p.includes('objection')||p.includes('महंगा')||p.includes('price')||p.includes('sasta')||p.includes('loan')){
+    const projO=prompt.match(/project[:\s]+([^\n,]+)/i);
+    const pr=projO?projO[1].trim():'hamara project';
+    if(p.includes('महंगा')||p.includes('price')||p.includes('sasta')){
+      return `"Sir, main aapki baat bilkul samajhta hoon — budget sab ka important hota hai. 😊\n\nLekin sir, ek baat sochiye:\n\n✅ ${pr} ka location premium hai — Jaipur ki sabse fast-growing zone mein\n✅ Abhi jo price hai woh next 6 months mein 15-20% badhne wala hai\n✅ Hamara flexible payment plan hai — 20% down payment mein booking ho jaati hai\n✅ Bank loan bhi available hai — EMI bilkul affordable hai\n\nSir, investment soch kar dekhiye — yeh expense nahi, asset hai jo har saal badhega.\n\nEk baar site dekhne aayiye — koi commitment nahi. Main personally dikhaunga!\nCall karein: [your number]"`;
+    } else {
+      return `"Sir, aapki baat sunkar achha laga — honest feedback hamesha helpful hoti hai. 😊\n\n${pr} ke baare mein aapka jo bhi concern hai, hum personally address kar sakte hain:\n\n✅ RERA Approved — 100% legal aur safe\n✅ Hamara track record strong hai\n✅ Satisfied customers referral dete hain\n✅ Koi hidden charges nahi\n\nSir, ek baar personally aayiye — aapko khud hi sab clear ho jayega.\n\nCall karein ya WhatsApp karein: [your number]"`;
+    }
+  }
+  
+  // Generic response
+  return `Krishan ji, yeh lead ke liye meri suggestion:\n\n✅ Aaj hi follow-up karein — jitna jaldi utna better\n✅ Site visit schedule karne ki koshish karein\n✅ Payment plan clearly samjhaayein\n✅ Family ko saath laane ke liye encourage karein\n\nJaipur market mein Army Area ke paas properties ka demand bahut badh raha hai — yeh selling point use karein!\n\nKoi specific sawaal ho toh poochhen! 🏠`;
 }
 
 function setAiLoading(btnId, resultId, loading) {
