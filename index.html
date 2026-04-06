@@ -1669,15 +1669,21 @@ function showCallHistory(id){
 
 function waLead(phone,project){
   const msg=encodeURIComponent('नमस्ते! मैं '+(project||'RE')+' के बारे में आपसे बात करना चाहता था। क्या आप अभी available हैं?');
-  const rawMsg='नमस्ते! मैं '+(project||'RE')+' के बारे में आपसे बात करना चाहता था। क्या आप अभी available हैं?';
   const fallbackUrl='https://wa.me/91'+phone+'?text='+msg;
   
   if(/android/i.test(navigator.userAgent)){
-    // WhatsApp Business ka package: com.whatsapp.w4b
-    const intentBiz='intent://send/+91'+phone+'#Intent;scheme=smsto;package=com.whatsapp.w4b;S.sms_body='+encodeURIComponent(rawMsg)+';end';
-    window.location.replace(intentBiz);
-  } else if(window.navigator.standalone || window.matchMedia('(display-mode:standalone)').matches){
-    window.location.replace('whatsapp://send?phone=91'+phone+'&text='+msg);
+    // Pehle WhatsApp Business try karo, phir Normal WA, phir wa.me
+    const a=document.createElement('a');
+    // whatsapp:// scheme dono apps support karta hai — Play Store nahi khulega
+    a.href='whatsapp://send?phone=91'+phone+'&text='+msg;
+    a.target='_system';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    // 2.5 sec baad agar WA nahi khula to wa.me open karo (browser mein)
+    setTimeout(function(){
+      window.open(fallbackUrl,'_system');
+    }, 2500);
   } else {
     window.open(fallbackUrl,'_blank','noopener,noreferrer');
   }
