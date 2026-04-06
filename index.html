@@ -1319,7 +1319,7 @@ window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredPro
 function installApp(){if(deferredPrompt){deferredPrompt.prompt();deferredPrompt.userChoice.then(r=>{if(r.outcome==='accepted')showToast('🎉 App install ho gayi!','success');deferredPrompt=null;document.getElementById('installBanner').classList.remove('visible');});}}
 
 // ===== AI FEATURES =====
-const AI_API_KEY = 'YOUR_ANTHROPIC_API_KEY_HERE';
+const AI_API_KEY = 'AIzaSyBMK7pPzoZUFhfk5zMMSRpT_mi26FqvfpM';
 
 function switchAiSection(id, btn) {
   document.querySelectorAll('.ai-section').forEach(s => s.classList.remove('active'));
@@ -1417,7 +1417,7 @@ function openAiForLead(id) {
 }
 
 async function callClaudeAPI(prompt) {
-  if (AI_API_KEY === 'YOUR_ANTHROPIC_API_KEY_HERE') {
+  if (AI_API_KEY === 'AIzaSyBMK7pPzoZUFhfk5zMMSRpT_mi26FqvfpM') {
     // Demo mode — return simulated response
     await new Promise(r => setTimeout(r, 1500));
     return null; // will trigger demo mode
