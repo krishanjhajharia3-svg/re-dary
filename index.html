@@ -568,18 +568,49 @@ body{font-family:'Noto Sans Devanagari','Rajdhani',sans-serif;background:var(--b
 <script>
   window.OneSignalDeferred = window.OneSignalDeferred || [];
   OneSignalDeferred.push(async function(OneSignal) {
-    await OneSignal.init({
-      appId: "69f0132e-f799-4456-9a82-98c255827e3d",
-      serviceWorkerPath: "OneSignalSDKWorker.js",
-      notifyButton: { enable: false },
-      allowLocalhostAsSecureOrigin: true,
-    });
-    // Permission maango
-    await OneSignal.Notifications.requestPermission();
-    // Player ID save karo
-    const playerId = await OneSignal.User.PushSubscription.id;
-    if(playerId) localStorage.setItem('os_player_id', playerId);
-    console.log('OneSignal ready! Player ID:', playerId);
+    try {
+      await OneSignal.init({
+        appId: "69f0132e-f799-4456-9a82-98c255827e3d",
+        serviceWorkerPath: "/re-dary/OneSignalSDKWorker.js",
+        serviceWorkerParam: { scope: "/re-dary/" },
+        notifyButton: { enable: false },
+        allowLocalhostAsSecureOrigin: true,
+        welcomeNotification: {
+          title: "Leado CRM",
+          message: "Notifications ON! Follow-up reminders milenge! 🎉"
+        }
+      });
+      
+      console.log('OneSignal initialized!');
+      
+      // Subscription status check karo
+      const isSubscribed = OneSignal.User.PushSubscription.optedIn;
+      console.log('Subscribed:', isSubscribed);
+      
+      if(!isSubscribed) {
+        // Permission maango
+        await OneSignal.Notifications.requestPermission();
+      }
+      
+      // Player ID save karo
+      setTimeout(async function() {
+        const playerId = OneSignal.User.PushSubscription.id;
+        if(playerId) {
+          localStorage.setItem('os_player_id', playerId);
+          console.log('OneSignal Player ID saved:', playerId);
+        }
+      }, 2000);
+      
+      // Subscription change listener
+      OneSignal.User.PushSubscription.addEventListener('change', function(event) {
+        console.log('Subscription changed:', event);
+        const id = OneSignal.User.PushSubscription.id;
+        if(id) localStorage.setItem('os_player_id', id);
+      });
+      
+    } catch(e) {
+      console.log('OneSignal error:', e);
+    }
   });
 </script>
 </head>
