@@ -19,6 +19,7 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
   import { getFirestore, doc, setDoc, getDoc, collection, getDocs, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyDUd4baHAJqsgjzod7wviM0TgLRR2ugNmg",
@@ -32,6 +33,8 @@
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db = getFirestore(app);
+  const messaging = getMessaging(app);
+  window._fbMessaging = messaging;
   const provider = new GoogleAuthProvider();
 
   // Global mein expose karo
@@ -598,6 +601,22 @@ body{font-family:'Noto Sans Devanagari','Rajdhani',sans-serif;background:var(--b
         if(playerId) {
           localStorage.setItem('os_player_id', playerId);
           console.log('OneSignal Player ID saved:', playerId);
+          
+          // FCM Token bhi save karo
+          try {
+            const fcmToken = await getToken(messaging, {
+              vapidKey: 'BIWp7MB4UU6R-OLHn16Tq2Uld8M3fAkNeMzGMaR07YVPMbVgNY8iPHpNoDIxdfEPjDfWXCdbX8Wd3gtraB809S8'
+            });
+            if(fcmToken){
+              const uid = window._fbAuth?.currentUser?.uid || 'anonymous';
+              await setDoc(doc(db, 'fcm_tokens', uid), {
+                token: fcmToken,
+                updatedAt: new Date().toISOString()
+              });
+              console.log('FCM Token saved!', fcmToken);
+              window._fcmToken = fcmToken;
+            }
+          } catch(e){ console.log('FCM token error:', e); }
         }
       }, 2000);
       
@@ -3587,6 +3606,25 @@ async function scheduleFollowupNotification(lead){
       message: lead.nextNote || 'Follow-up karna hai!'
     });
     localStorage.setItem('scheduled_notifs', JSON.stringify(filtered));
+
+    // Firestore mein FCM notification schedule karo (app band ho tab bhi aayegi!)
+    try {
+      const fcmToken = window._fcmToken;
+      if(fcmToken && window._fbDb){
+        const {doc, setDoc} = window._fbFunctions;
+        await setDoc(doc(window._fbDb, 'scheduled_notifications', lead.id), {
+          token: fcmToken,
+          leadId: lead.id,
+          leadName: lead.name,
+          project: lead.project || '',
+          message: lead.nextNote || 'Follow-up karna hai!',
+          followupDateTime: notifDateTime.toISOString(),
+          scheduledAt: new Date().toISOString(),
+          status: 'pending'
+        });
+        console.log('FCM notification Firestore mein save hua:', lead.name);
+      }
+    } catch(e){ console.log('Firestore save error:', e); }
     
     // Service Worker ko message bhejo
     if('serviceWorker' in navigator && navigator.serviceWorker.controller){
