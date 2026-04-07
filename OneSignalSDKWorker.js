@@ -28,7 +28,7 @@ self.addEventListener('message', function(e) {
     scheduledNotifications[data.leadId] = setTimeout(function() {
       self.registration.showNotification(data.title, {
         body: data.body,
-        icon: 'https://krishanjhajharia3-svg.github.io/re-dary/icon-192.png',
+        icon: 'https://krishanjhajharia3-svg.github.io/icon-192.png',
         tag: 'followup-' + data.leadId,
         requireInteraction: true,
         vibrate: [200, 100, 200],
@@ -58,13 +58,13 @@ self.addEventListener('notificationclick', function(e) {
     self.clients.matchAll({ type: 'window', includeUncontrolled: true })
       .then(function(clients) {
         for (let client of clients) {
-          if (client.url.includes('re-dary')) {
+          if (client.url.includes('krishanjhajharia3-svg.github.io')) {
             client.focus();
             if (leadId) client.postMessage({ type: 'OPEN_LEAD', leadId: leadId });
             return;
           }
         }
-        return self.clients.openWindow('https://krishanjhajharia3-svg.github.io/re-dary/');
+        return self.clients.openWindow('https://krishanjhajharia3-svg.github.io/');
       })
   );
 });
@@ -76,7 +76,7 @@ self.addEventListener('push', function(e) {
     e.waitUntil(
       self.registration.showNotification(data.title || 'Leado CRM', {
         body: data.body || 'Follow-up reminder!',
-        icon: 'https://krishanjhajharia3-svg.github.io/re-dary/icon-192.png',
+        icon: 'https://krishanjhajharia3-svg.github.io/icon-192.png',
         requireInteraction: true,
         vibrate: [200, 100, 200]
       })
