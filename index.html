@@ -571,8 +571,8 @@ body{font-family:'Noto Sans Devanagari','Rajdhani',sans-serif;background:var(--b
     try {
       await OneSignal.init({
         appId: "69f0132e-f799-4456-9a82-98c255827e3d",
-        serviceWorkerPath: "/re-dary/OneSignalSDKWorker.js",
-        serviceWorkerParam: { scope: "/re-dary/" },
+        serviceWorkerPath: "/OneSignalSDKWorker.js",
+        serviceWorkerParam: { scope: "/" },
         notifyButton: { enable: false },
         allowLocalhostAsSecureOrigin: true,
         welcomeNotification: {
@@ -3606,8 +3606,8 @@ function showBrowserNotification(title, body, leadId){
   }
   const notif = new Notification(title, {
     body: body,
-    icon: 'https://krishanjhajharia3-svg.github.io/re-dary/icon-192.png',
-    badge: 'https://krishanjhajharia3-svg.github.io/re-dary/icon-192.png',
+    icon: 'https://krishanjhajharia3-svg.github.io/icon-192.png',
+    badge: 'https://krishanjhajharia3-svg.github.io/icon-192.png',
     tag: 'followup-' + leadId,
     requireInteraction: true,
     vibrate: [200, 100, 200]
