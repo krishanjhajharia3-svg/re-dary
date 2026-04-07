@@ -102,8 +102,10 @@
     if (result && result.user) {
       window._fbUser = result.user;
       localStorage.removeItem('fb_login_pending');
-      // Page properly reload karo — white screen nahi aayega
-      window.location.replace(window.location.href);
+      console.log('[Auth] Redirect login success:', result.user.email);
+      // UI update karo
+      updateFirebaseUI(result.user);
+      window.dispatchEvent(new CustomEvent('fbUserReady', { detail: result.user }));
     }
   }).catch((e) => { 
     console.log('Redirect result error:', e.code);
@@ -1755,14 +1757,36 @@ function updateFirebaseSyncStatus(msg, type=''){
 // Firebase Google Login
 async function firebaseGoogleLogin(){
   try{
-    // WebIntoApp APK mein seedha redirect use karo — popup kaam nahi karta
     showToast('☁️ Google login ho raha hai...','');
-    localStorage.setItem('fb_login_pending','1');
-    const { signInWithRedirect } = window._fbFunctions;
-    window._fbProvider.setCustomParameters({ prompt: 'select_account' });
-    await signInWithRedirect(window._fbAuth, window._fbProvider);
+
+    // Pehle popup try karo
+    try{
+      const { signInWithPopup } = window._fbFunctions;
+      window._fbProvider.setCustomParameters({ prompt: 'select_account' });
+      const result = await signInWithPopup(window._fbAuth, window._fbProvider);
+      if(result && result.user){
+        window._fbUser = result.user;
+        updateFirebaseUI(result.user);
+        showToast('✅ '+result.user.displayName+' — Login ho gaya!','success');
+        await checkAndLoadUserProfile();
+        await loadFromFirestore();
+        return;
+      }
+    } catch(popupErr){
+      console.log('[Auth] Popup error:', popupErr.code);
+      // Popup block hua — redirect try karo
+      try{
+        localStorage.setItem('fb_login_pending','1');
+        const { signInWithRedirect } = window._fbFunctions;
+        window._fbProvider.setCustomParameters({ prompt: 'select_account' });
+        await signInWithRedirect(window._fbAuth, window._fbProvider);
+      } catch(redirectErr){
+        console.log('[Auth] Redirect error:', redirectErr.code);
+        showToast('❌ Login fail — Internet check karo','');
+      }
+    }
   }catch(e){
-    console.log('Firebase login error:', e.code, e.message);
+    console.log('[Auth] Login error:', e.code, e.message);
     showToast('❌ Login fail: '+(e.message||e.code));
   }
 }
