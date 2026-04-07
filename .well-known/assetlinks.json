@@ -1,0 +1,10 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "io.github.krishanjhajharia3_svg.twa",
+    "sha256_cert_fingerprints": [
+      "9F:02:BB:D6:41:BC:97:5E:41:4B:4A:F2:13:9F:CC:75:20:06:47:8B:35:23:A3:06:22:CB:EC:B1:27:C7:7A:55"
+    ]
+  }
+}]
