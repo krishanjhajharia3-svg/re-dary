@@ -43,16 +43,56 @@
   window._fbProvider = provider;
   window._fbFunctions = { signInWithPopup, signInWithRedirect, getRedirectResult, onAuthStateChanged, signOut, doc, setDoc, getDoc, collection, getDocs, deleteDoc };
 
-  // Auth state listener — yeh sabse pehle fire hoga
+  // ===== FCM TOKEN SAVE — App band ho tab bhi notification! =====
+  async function initFCMandSaveToken(userId) {
+    try {
+      if (!('Notification' in window)) return;
+
+      // Permission maango
+      let permission = Notification.permission;
+      if (permission === 'default') {
+        permission = await Notification.requestPermission();
+      }
+      if (permission !== 'granted') {
+        console.log('[FCM] Notification permission denied');
+        return;
+      }
+
+      // FCM Token lo
+      const token = await getToken(messaging, {
+        vapidKey: 'BIWp7MB4UU6R-OLHn16Tq2Uld8M3fAkNeMzGMaR07YVPMbVgNY8iPHpNoDIxdfEPjDfWXCdbX8Wd3gtraB809S8'
+      });
+
+      if (token) {
+        // Token Firestore mein save karo
+        await setDoc(doc(db, 'fcm_tokens', userId), {
+          token: token,
+          platform: /Android/i.test(navigator.userAgent) ? 'android' : 'web',
+          updatedAt: new Date().toISOString(),
+          appVersion: 'leado-v3'
+        });
+        window._fcmToken = token;
+        console.log('[FCM] Token saved successfully!', token.substring(0,20)+'...');
+      }
+    } catch(e) {
+      console.log('[FCM] Token init error:', e.message || e);
+    }
+  }
+
+  // Auth state change hone pe FCM token save karo
   onAuthStateChanged(auth, (user) => {
     if (user) {
       window._fbUser = user;
       window.dispatchEvent(new CustomEvent('fbUserReady', { detail: user }));
+      // FCM Token save karo login ke baad
+      setTimeout(() => initFCMandSaveToken(user.uid), 2000);
     } else {
       window._fbUser = null;
       window.dispatchEvent(new CustomEvent('fbUserSignedOut'));
     }
   });
+
+  // Auth state listener — upar wala combined listener hai
 
   // Redirect se wapas aane pe result check karo
   getRedirectResult(auth).then((result) => {
@@ -2831,19 +2871,22 @@ window.addEventListener('load',()=>{setTimeout(()=>{initGoogleAuth();initDriveAu
 
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){
-    // OneSignal SW register karo
-    navigator.serviceWorker.register('/OneSignalSDKWorker.js', {scope: '/'})
+    // 1. Custom sw.js register karo (notifications ke liye)
+    navigator.serviceWorker.register('/sw.js', {scope: '/'})
       .then(function(reg){
-        console.log('SW registered:', reg.scope);
-        // SW ready hone ka wait karo
+        console.log('[SW] Custom sw.js registered:', reg.scope);
         return navigator.serviceWorker.ready;
       })
       .then(function(reg){
-        console.log('SW ready!');
-        // Ab notifications schedule karo
+        console.log('[SW] Custom SW ready!');
         setTimeout(scheduleAllNotifications, 1000);
       })
-      .catch(function(err){ console.log('SW error:', err); });
+      .catch(function(err){ console.log('[SW] Custom SW error:', err); });
+
+    // 2. OneSignal SW register karo
+    navigator.serviceWorker.register('/OneSignalSDKWorker.js', {scope: '/'})
+      .then(function(reg){ console.log('[OneSignal SW] Registered:', reg.scope); })
+      .catch(function(err){ console.log('[OneSignal SW] Error:', err); });
   });
   
   // SW se message receive karo
@@ -2853,6 +2896,7 @@ if('serviceWorker' in navigator){
     }
   });
 }
+// SW registration upar handle ho gaya
 
 function checkNotifications(){
   const today=new Date().toISOString().split('T')[0];
