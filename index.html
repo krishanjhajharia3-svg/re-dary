@@ -10,7 +10,9 @@
 <meta name="apple-mobile-web-app-title" content="Leado">
 <link rel="manifest" href="manifest.json">
 <title>Leado — Real Estate CRM</title>
-<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Noto+Sans+Devanagari:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <!-- Firebase SDK -->
 <script type="module">
@@ -63,7 +65,15 @@
   });
 </script>
 <style>
-:root{--bg-primary:#0a0f1a;--bg-card:#111827;--bg-card2:#1a2235;--accent-gold:#d4a843;--accent-gold-light:#f0c96a;--accent-teal:#00d4aa;--accent-red:#ff4d6d;--accent-blue:#4d9fff;--accent-purple:#a78bfa;--text-primary:#f0f4ff;--text-secondary:#8896b3;--text-muted:#4a5568;--border:#1e2d42;--border-glow:rgba(212,168,67,0.3);--shadow:0 8px 32px rgba(0,0,0,0.5);--radius:14px}
+:root{
+--bg-primary:#0a0f1a;--bg-card:#111827;--bg-card2:#1a2235;
+--accent-gold:#d4a843;--accent-gold-light:#f0c96a;--accent-teal:#00d4aa;
+--accent-red:#ff4d6d;--accent-blue:#4d9fff;--accent-purple:#a78bfa;
+--text-primary:#f0f4ff;--text-secondary:#8896b3;--text-muted:#4a5568;
+--border:#1e2d42;--border-glow:rgba(212,168,67,0.3);
+--shadow:0 8px 32px rgba(0,0,0,0.5);--radius:14px;
+--ease:cubic-bezier(0.34,1.56,0.64,1);--fast:cubic-bezier(0.25,0.46,0.45,0.94)
+}
 *{margin:0;padding:0;box-sizing:border-box}
 .fb-sync-status{transition:all .3s}
 .fb-sync-status.success{color:#00d4aa!important;background:rgba(0,212,170,.08)!important;}
@@ -99,7 +109,7 @@ body{font-family:'Noto Sans Devanagari','Rajdhani',sans-serif;background:var(--b
 .bottom-nav-item.active.ai{color:#00d4aa;background:rgba(0,212,170,.1)}
 .bottom-nav-icon{font-size:20px;line-height:1}
 .bottom-nav-label{font-size:9px;font-family:'Noto Sans Devanagari',sans-serif;font-weight:500}
-.main-content{padding:14px;padding-bottom:110px}
+.main-content{padding:14px;padding-bottom:110px;will-change:transform;}
 .section-title{font-family:'Rajdhani',sans-serif;font-size:16px;font-weight:700;color:var(--accent-gold-light);margin-bottom:14px;display:flex;align-items:center;gap:8px}
 .section-title::after{content:'';flex:1;height:1px;background:linear-gradient(to right,var(--border),transparent)}
 .lead-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:13px;margin-bottom:11px;position:relative;overflow:hidden;transition:all .2s;cursor:pointer}
@@ -298,6 +308,18 @@ body{font-family:'Noto Sans Devanagari','Rajdhani',sans-serif;background:var(--b
 .footer-brand{font-family:'Rajdhani',sans-serif;font-size:14px;font-weight:700;color:var(--accent-gold);margin-bottom:4px}
 .footer-contact{font-size:11px;color:var(--text-muted)}
 .footer-contact a{color:var(--accent-teal);text-decoration:none}
+/* ONBOARDING */
+#onboardScreen{position:fixed;inset:0;background:linear-gradient(135deg,#0a0f1a,#0d1f35);z-index:10000;display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+#onboardScreen.show{display:flex}
+.ob-card{width:100%;max-width:400px;background:#111827;border:1px solid #1e2d42;border-radius:20px;padding:28px 22px}
+.ob-icon{font-size:44px;text-align:center;margin-bottom:8px}
+.ob-title{font-family:Rajdhani,sans-serif;font-size:22px;font-weight:700;color:#f0c96a;text-align:center;margin-bottom:4px}
+.ob-sub{font-size:12px;color:#8896b3;text-align:center;margin-bottom:20px;line-height:1.6}
+.ob-inp{width:100%;padding:12px 14px;background:#1a2235;border:1px solid #1e2d42;border-radius:10px;color:#f0f4ff;font-size:15px;font-family:'Noto Sans Devanagari',sans-serif;outline:none;margin-bottom:12px;transition:border .2s}
+.ob-inp:focus{border-color:#d4a843}
+.ob-btn{width:100%;padding:14px;border-radius:12px;border:none;background:linear-gradient(135deg,#d4a843,#e8881a);color:#0a0f1a;font-size:16px;font-weight:700;font-family:Rajdhani,sans-serif;cursor:pointer;margin-top:4px;letter-spacing:.5px}
+.ob-err{color:#ff4d6d;font-size:12px;text-align:center;margin-top:-8px;margin-bottom:8px;display:none}
+
 
 /* ===== NOTIFICATION POPUP ===== */
 .notif-popup{position:fixed;top:70px;left:12px;right:12px;background:linear-gradient(135deg,#1a2235,#111827);border:1px solid rgba(212,168,67,.3);border-radius:16px;padding:14px 16px;z-index:500;box-shadow:0 8px 32px rgba(0,0,0,.5);display:none;animation:slideDown .3s ease}
@@ -344,7 +366,222 @@ body{font-family:'Noto Sans Devanagari','Rajdhani',sans-serif;background:var(--b
 .home-ai-quick{margin:0 14px 12px;background:linear-gradient(135deg,rgba(0,212,170,.1),rgba(0,153,204,.05));border:1px solid rgba(0,212,170,.2);border-radius:14px;padding:14px;display:flex;align-items:center;gap:12px;cursor:pointer}
 .home-ai-icon{width:44px;height:44px;background:rgba(0,212,170,.15);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
 .home-empty{text-align:center;padding:16px 8px;color:var(--text-muted);font-size:12px}
+
+/* ===== PREMIUM ANIMATIONS ===== */
+@keyframes fadeInUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes scaleIn{from{opacity:0;transform:scale(0.92)}to{opacity:1;transform:scale(1)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes ripple{to{transform:scale(4);opacity:0}}
+@keyframes slideDown{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes bounce{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+@keyframes confetti-fall{0%{transform:translateY(-10px) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+@keyframes glow-pulse{0%,100%{box-shadow:0 0 0 0 rgba(212,168,67,0.4)}50%{box-shadow:0 0 0 8px rgba(212,168,67,0)}}
+
+/* ===== PREMIUM LEAD CARDS ===== */
+.lead-card{
+  background:linear-gradient(135deg,var(--bg-card) 0%,rgba(26,34,53,0.95) 100%);
+  border:1px solid var(--border);
+  border-radius:16px;padding:14px;margin-bottom:12px;
+  position:relative;overflow:hidden;cursor:pointer;
+  transition:transform 0.2s var(--ease),box-shadow 0.2s var(--fast),border-color 0.2s;
+  animation:fadeInUp 0.3s var(--fast) both;
+  will-change:transform;
+}
+.lead-card::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0.03) 0%,transparent 50%);
+  pointer-events:none;border-radius:16px;
+}
+.lead-card:active{transform:scale(0.98)!important;}
+.lead-card:hover{
+  border-color:var(--border-glow);
+  transform:translateY(-2px);
+  box-shadow:0 8px 30px rgba(0,0,0,0.4),0 0 0 1px rgba(212,168,67,0.1);
+}
+.lead-card.status-hot{border-left:3px solid var(--accent-red);background:linear-gradient(135deg,rgba(255,77,109,0.04) 0%,var(--bg-card) 40%);}
+.lead-card.status-warm{border-left:3px solid var(--accent-gold);background:linear-gradient(135deg,rgba(212,168,67,0.04) 0%,var(--bg-card) 40%);}
+.lead-card.status-cold{border-left:3px solid var(--accent-blue);background:linear-gradient(135deg,rgba(77,159,255,0.04) 0%,var(--bg-card) 40%);}
+.lead-card.status-converted{border-left:3px solid var(--accent-teal);background:linear-gradient(135deg,rgba(0,212,170,0.04) 0%,var(--bg-card) 40%);}
+
+/* ===== PREMIUM BUTTONS ===== */
+.btn-primary,.btn-purple,.btn-secondary,.btn-danger,.btn-google,.btn-gcontact{
+  position:relative;overflow:hidden;transition:all 0.2s var(--ease);
+}
+.btn-primary:active,.btn-purple:active,.btn-secondary:active{transform:scale(0.97);}
+.action-btn{transition:all 0.15s var(--ease);}
+.action-btn:active{transform:scale(0.93);}
+
+/* Ripple effect */
+.ripple-effect{
+  position:absolute;border-radius:50%;
+  background:rgba(255,255,255,0.3);
+  width:10px;height:10px;
+  animation:ripple 0.5s linear;
+  pointer-events:none;transform:scale(0);
+}
+
+/* ===== PREMIUM STAT BAR ===== */
+.stat-item{
+  transition:all 0.2s var(--ease);
+  position:relative;overflow:hidden;
+}
+.stat-item:active{transform:scale(0.95);}
+.stat-num{
+  transition:all 0.3s var(--ease);
+  display:inline-block;
+}
+.stat-num.updating{animation:bounce 0.3s var(--ease);}
+
+/* ===== PREMIUM STATUS BADGES ===== */
+.status-badge{
+  transition:all 0.2s;
+  animation:scaleIn 0.2s var(--ease);
+}
+.badge-hot{animation:glow-pulse 2s infinite;}
+
+/* ===== PREMIUM ACTION BUTTONS ===== */
+.action-btn{
+  border-radius:10px;transition:all 0.15s var(--ease);
+  backdrop-filter:blur(4px);
+}
+.action-btn.call:active{background:rgba(0,212,170,0.2)!important;transform:scale(0.92);}
+.action-btn.whatsapp:active{background:rgba(37,211,102,0.2)!important;transform:scale(0.92);}
+
+/* ===== PREMIUM MODAL ===== */
+.modal{
+  animation:slideUp 0.35s var(--ease);
+  background:linear-gradient(180deg,#151f2e 0%,#111827 100%);
+  border-top:1px solid rgba(212,168,67,0.15);
+}
+
+/* ===== PREMIUM HEADER ===== */
+.app-header{
+  background:linear-gradient(135deg,rgba(15,25,35,0.98) 0%,rgba(20,35,52,0.98) 100%);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(212,168,67,0.1);
+}
+.logo-icon{
+  transition:transform 0.2s var(--ease);
+  box-shadow:0 4px 15px rgba(212,168,67,0.3);
+}
+.logo-icon:active{transform:scale(0.9);}
+
+/* ===== PREMIUM BOTTOM NAV ===== */
+.bottom-nav-item{transition:all 0.2s var(--ease);}
+.bottom-nav-item:active{transform:scale(0.88);}
+.bottom-nav-item.active{
+  background:rgba(212,168,67,0.12)!important;
+  box-shadow:0 -2px 0 var(--accent-gold) inset;
+}
+
+/* ===== PREMIUM TOAST ===== */
+.toast{
+  background:linear-gradient(135deg,#1a2a3a,#1e3248)!important;
+  border:1px solid rgba(212,168,67,0.2)!important;
+  border-radius:14px!important;
+  box-shadow:0 8px 32px rgba(0,0,0,0.5)!important;
+  font-size:13px!important;
+  animation:slideDown 0.3s var(--ease)!important;
+  backdrop-filter:blur(20px);
+}
+.toast.success{border-color:rgba(0,212,170,0.3)!important;background:linear-gradient(135deg,#0d2a22,#111f1a)!important;}
+
+/* ===== SKELETON LOADING ===== */
+.skeleton{
+  background:linear-gradient(90deg,var(--bg-card2) 25%,rgba(255,255,255,0.05) 50%,var(--bg-card2) 75%);
+  background-size:200% 100%;
+  animation:shimmer 1.5s infinite;
+  border-radius:8px;
+}
+
+/* ===== PREMIUM FORM INPUTS ===== */
+.form-input:focus,.form-select:focus,.form-textarea:focus{
+  border-color:var(--accent-gold)!important;
+  box-shadow:0 0 0 3px rgba(212,168,67,0.1)!important;
+  transform:translateY(-1px);
+  transition:all 0.2s var(--ease);
+}
+
+/* ===== HOME DASHBOARD PREMIUM ===== */
+.home-stat-card{
+  transition:all 0.2s var(--ease);
+  position:relative;overflow:hidden;
+}
+.home-stat-card::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,0.03),transparent);
+  pointer-events:none;
+}
+.home-stat-card:active{transform:scale(0.96);}
+
+/* ===== FAB PREMIUM ===== */
+.fab{
+  box-shadow:0 8px 24px rgba(212,168,67,0.5),0 4px 8px rgba(0,0,0,0.3)!important;
+  transition:all 0.2s var(--ease)!important;
+}
+.fab:active{transform:scale(0.92) rotate(-5deg)!important;}
+
+/* ===== OVERDUE BADGE PREMIUM ===== */
+.overdue-badge{
+  animation:glow-pulse 1.5s infinite;
+  font-weight:700!important;
+}
+
+/* ===== CHIP FILTER PREMIUM ===== */
+.chip{transition:all 0.15s var(--ease);}
+.chip:active{transform:scale(0.93);}
+.chip.active{
+  box-shadow:0 4px 12px rgba(212,168,67,0.3);
+  transform:translateY(-1px);
+}
+
+/* ===== CONFETTI ===== */
+.confetti-piece{
+  position:fixed;width:8px;height:8px;border-radius:2px;
+  animation:confetti-fall 1.2s ease-in forwards;
+  pointer-events:none;z-index:99999;
+}
+
+/* ===== LEAD CARD STAGGER ANIMATION ===== */
+.lead-card:nth-child(1){animation-delay:0.05s}
+.lead-card:nth-child(2){animation-delay:0.1s}
+.lead-card:nth-child(3){animation-delay:0.15s}
+.lead-card:nth-child(4){animation-delay:0.2s}
+.lead-card:nth-child(5){animation-delay:0.25s}
+.lead-card:nth-child(n+6){animation-delay:0.3s}
+
+/* ===== SMOOTH TAB TRANSITION ===== */
+.tab-content{animation:fadeIn 0.25s var(--fast);}
+.tab-content.active{animation:fadeInUp 0.3s var(--fast);}
+
+/* ===== ICON BTN PREMIUM ===== */
+.icon-btn{transition:all 0.15s var(--ease);}
+.icon-btn:active{transform:scale(0.85);background:rgba(212,168,67,0.15)!important;}
+
 </style>
+
+<!-- OneSignal Push Notifications -->
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(async function(OneSignal) {
+    await OneSignal.init({
+      appId: "69f0132e-f799-4456-9a82-98c255827e3d",
+      serviceWorkerPath: "OneSignalSDKWorker.js",
+      notifyButton: { enable: false },
+      allowLocalhostAsSecureOrigin: true,
+    });
+    // Permission maango
+    await OneSignal.Notifications.requestPermission();
+    // Player ID save karo
+    const playerId = await OneSignal.User.PushSubscription.id;
+    if(playerId) localStorage.setItem('os_player_id', playerId);
+    console.log('OneSignal ready! Player ID:', playerId);
+  });
+</script>
 </head>
 <body>
 
@@ -394,11 +631,11 @@ body{font-family:'Noto Sans Devanagari','Rajdhani',sans-serif;background:var(--b
 </div>
 
 <div class="app-header">
-  <div class="app-logo">
-    <div class="logo-icon" style="background:linear-gradient(135deg,#d4a843,#e8881a);color:#0a0f1a;font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:900;letter-spacing:-1px">L</div>
+  <div class="app-logo" onclick="openProfileModal(true)" style="cursor:pointer" title="Profile Edit Karein">
+    <div class="logo-icon" id="headerAvatar" style="background:linear-gradient(135deg,#d4a843,#e8881a);color:#0a0f1a;font-family:'Rajdhani',sans-serif;font-size:18px;font-weight:900;letter-spacing:-1px">👤</div>
     <div>
-      <div class="app-title-text">LEADO</div>
-      <div class="app-subtitle">Real Estate CRM by Krishan</div>
+      <div class="app-title-text" id="headerName">LEADO</div>
+      <div class="app-subtitle" id="headerSub">Real Estate CRM</div>
     </div>
   </div>
   <div class="header-actions">
@@ -447,7 +684,8 @@ body{font-family:'Noto Sans Devanagari','Rajdhani',sans-serif;background:var(--b
   <!-- HOME TAB -->
   <div class="tab-content active" id="tab-home">
     <div class="home-greeting">
-      <div class="home-greet-text" id="homeGreeting">Namaskar, Krishan ji! 👋</div>
+      <div class="home-greet-text" id="homeGreeting">Namaskar, Agent ji! 👋</div>
+      <div id="motivQuote" style="font-size:11px;color:var(--accent-gold);opacity:0.8;margin-top:4px;font-style:italic"></div>
       <div class="home-greet-sub" id="homeGreetSub">Loading...</div>
     </div>
 
@@ -910,6 +1148,56 @@ body{font-family:'Noto Sans Devanagari','Rajdhani',sans-serif;background:var(--b
   </div>
 </div>
 
+
+<!-- ONBOARDING SCREEN -->
+<div id="onboardScreen">
+  <div class="ob-card">
+    <div class="ob-icon">👤</div>
+    <div class="ob-title">Apna Parichay Dein</div>
+    <div class="ob-sub">Sirf ek baar — app aapke naam se kaam karega!</div>
+    <input class="ob-inp" id="obFirstName" type="text" placeholder="First Name *" maxlength="30">
+    <input class="ob-inp" id="obLastName" type="text" placeholder="Last Name *" maxlength="30">
+    <input class="ob-inp" id="obMobile" type="tel" placeholder="Mobile No *" maxlength="10" pattern="[0-9]*">
+    <div class="ob-err" id="obErr">⚠️ Sab fields bharna zaroori hai!</div>
+    <button class="ob-btn" onclick="saveOnboarding()">🚀 Shuru Karein</button>
+  </div>
+</div>
+
+
+<!-- PROFILE SETUP MODAL -->
+<div class="modal-overlay" id="profileModal" style="z-index:10001">
+  <div class="modal" style="padding-bottom:30px">
+    <div class="modal-handle"></div>
+    <div class="modal-title" style="color:#00d4aa">👤 Apna Parichay</div>
+    <div style="font-size:12px;color:var(--text-secondary);text-align:center;margin-bottom:16px;line-height:1.6">
+      Pehli baar login kar rahe hain — apna naam aur mobile daalo!
+    </div>
+    <div class="form-group">
+      <label class="form-label">First Name *</label>
+      <input class="form-input" id="profFirstName" type="text" placeholder="Jaise: Rakesh" maxlength="30">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Last Name *</label>
+      <input class="form-input" id="profLastName" type="text" placeholder="Jaise: Sharma" maxlength="30">
+    </div>
+    <div class="form-group">
+      <label class="form-label">📞 Mobile No *</label>
+      <input class="form-input" id="profMobile" type="tel" placeholder="10 digit mobile number" maxlength="10">
+    </div>
+    <div class="form-group">
+      <label class="form-label">💬 WhatsApp No</label>
+      <input class="form-input" id="profWhatsApp" type="tel" placeholder="WhatsApp number (same ya alag)" maxlength="10">
+    </div>
+    <div class="form-group">
+      <label class="form-label">📍 City</label>
+      <input class="form-input" id="profCity" type="text" placeholder="Jaise: Jaipur" maxlength="30">
+    </div>
+    <div id="profErr" style="color:#ff4d6d;font-size:12px;text-align:center;margin-bottom:10px;display:none">⚠️ Zaroori fields bharo!</div>
+    <button class="btn-primary" onclick="saveProfile(false)" style="margin-bottom:8px">✅ Save Karein</button>
+    <button class="btn-secondary" id="profCancelBtn" onclick="closeProfileModal()" style="display:none">Cancel</button>
+  </div>
+</div>
+
 <!-- VISIT MODAL -->
 <div class="modal-overlay" id="visitModal">
   <div class="modal" style="padding-bottom:20px">
@@ -1065,8 +1353,11 @@ body{font-family:'Noto Sans Devanagari','Rajdhani',sans-serif;background:var(--b
         <button onclick="firebaseSignOut()" style="background:rgba(255,77,109,.1);border:1px solid rgba(255,77,109,.3);color:var(--accent-red);padding:5px 10px;border-radius:8px;font-size:11px;cursor:pointer">Logout</button>
       </div>
       <div id="fbSyncStatus" style="font-size:11px;color:var(--text-muted);text-align:center;margin-bottom:8px;padding:6px;border-radius:8px">☁️ Cloud sync active hai</div>
-      <button onclick="syncToFirestore();showToast('☁️ Sync ho raha hai...','');" style="width:100%;padding:10px;border-radius:10px;border:1px solid rgba(0,212,170,.3);background:rgba(0,212,170,.08);color:#00d4aa;font-size:13px;cursor:pointer;font-family:'Noto Sans Devanagari',sans-serif">
+      <button onclick="syncToFirestore();showToast('☁️ Sync ho raha hai...','');" style="width:100%;padding:10px;border-radius:10px;border:1px solid rgba(0,212,170,.3);background:rgba(0,212,170,.08);color:#00d4aa;font-size:13px;cursor:pointer;font-family:'Noto Sans Devanagari',sans-serif;margin-bottom:8px">
         🔄 Manual Sync karein
+      </button>
+      <button onclick="openProfileModal(true);closeExportModal();" style="width:100%;padding:10px;border-radius:10px;border:1px solid rgba(212,168,67,.3);background:rgba(212,168,67,.08);color:#d4a843;font-size:13px;cursor:pointer;font-family:'Noto Sans Devanagari',sans-serif">
+        ✏️ Profile Edit Karein
       </button>
     </div>
 
@@ -1083,6 +1374,104 @@ body{font-family:'Noto Sans Devanagari','Rajdhani',sans-serif;background:var(--b
 let leads=JSON.parse(localStorage.getItem('re_leads')||'[]');
 let editingId=null,visitingId=null,contactId=null,currentFilter='all',deferredPrompt=null;
 
+
+// ===== ONBOARDING =====
+function getUserName(){
+  const f = localStorage.getItem('leado_fname')||'';
+  const l = localStorage.getItem('leado_lname')||'';
+  return (f+' '+l).trim() || 'Agent';
+}
+function getUserFirstName(){
+  return localStorage.getItem('leado_fname') || 'Agent';
+}
+function getUserMobile(){
+  return localStorage.getItem('leado_mobile') || '';
+}
+function getUserWhatsApp(){
+  return localStorage.getItem('leado_whatsapp') || localStorage.getItem('leado_mobile') || '';
+}
+function getUserCity(){
+  return localStorage.getItem('leado_city') || 'Jaipur';
+}
+
+function checkOnboarding(){
+  const fname = localStorage.getItem('leado_fname');
+  if(!fname){
+    document.getElementById('onboardScreen').classList.add('show');
+    return false;
+  }
+  return true;
+}
+
+function saveOnboarding(){
+  const fname = document.getElementById('obFirstName').value.trim();
+  const lname = document.getElementById('obLastName').value.trim();
+  const mobile = document.getElementById('obMobile').value.trim();
+  const err = document.getElementById('obErr');
+  
+  if(!fname || !lname || !mobile || mobile.length < 10){
+    err.style.display='block';
+    err.textContent = !fname||!lname ? '⚠️ Naam bharna zaroori hai!' : '⚠️ Sahi mobile number daalo!';
+    return;
+  }
+  err.style.display='none';
+  localStorage.setItem('leado_fname', fname);
+  localStorage.setItem('leado_lname', lname);
+  localStorage.setItem('leado_mobile', mobile);
+  
+  // Onboarding hide karo
+  document.getElementById('onboardScreen').classList.remove('show');
+  
+  // UI update karo
+  updateUserUI();
+  
+  showToast('✅ Swagat hai, '+fname+' ji! 🎉','success');
+  
+  // PIN screen dikhao
+  setTimeout(function(){ initPinLock(); }, 500);
+}
+
+function updateUserUI(){
+  const fname = getUserFirstName();
+  const fullname = getUserName();
+  const mobile = getUserMobile();
+  const waNum = getUserWhatsApp();
+  const city = getUserCity();
+  
+  // Header — naam dikhao
+  const headerName = document.getElementById('headerName');
+  if(headerName) headerName.textContent = fname ? fname+' ji' : 'LEADO';
+  
+  const headerSub = document.getElementById('headerSub');
+  if(headerSub) headerSub.textContent = fname ? 'Real Estate Agent | '+city : 'Real Estate CRM';
+  
+  // Header avatar — pehla letter
+  const headerAvatar = document.getElementById('headerAvatar');
+  if(headerAvatar) headerAvatar.textContent = fname ? fname[0].toUpperCase() : 'L';
+  
+  // Splash credit
+  const credit = document.querySelector('.splash-credit');
+  if(credit) credit.textContent = 'by '+fname+' | '+city;
+  
+  // Footer
+  const footer = document.querySelector('.footer-contact');
+  if(footer){
+    footer.innerHTML = '';
+    footer.appendChild(document.createTextNode('by '+fname+' | '+city+' | '));
+    const callLink = document.createElement('a');
+    callLink.href = 'tel:+91'+mobile;
+    callLink.textContent = '📞 Call';
+    footer.appendChild(callLink);
+    footer.appendChild(document.createTextNode(' | '));
+    const waLink = document.createElement('a');
+    waLink.href = 'javascript:void(0)';
+    waLink.textContent = '💬 WhatsApp';
+    waLink.onclick = function(){ openWhatsApp('whatsapp://send?phone=91'+waNum); };
+    footer.appendChild(waLink);
+  }
+}
+
+
 function saveData(){
   localStorage.setItem('re_leads',JSON.stringify(leads));
   localStorage.setItem('re_leads_backup',JSON.stringify(leads));
@@ -1096,6 +1485,121 @@ function saveData(){
     window._fbSyncTimer = setTimeout(()=>{ syncToFirestore(); }, 2000);
   }
 }
+
+
+// ===== USER PROFILE =====
+async function saveUserProfileToFirestore(data){
+  if(!window._fbUser || !window._fbDb) return;
+  try{
+    const { doc, setDoc } = window._fbFunctions;
+    const uid = window._fbUser.uid;
+    const ref = doc(window._fbDb, 'users', uid, 'profile', 'info');
+    await setDoc(ref, data);
+  }catch(e){ console.log('Profile save error:', e); }
+}
+
+async function loadUserProfileFromFirestore(){
+  if(!window._fbUser || !window._fbDb) return null;
+  try{
+    const { doc, getDoc } = window._fbFunctions;
+    const uid = window._fbUser.uid;
+    const ref = doc(window._fbDb, 'users', uid, 'profile', 'info');
+    const snap = await getDoc(ref);
+    if(snap.exists()) return snap.data();
+  }catch(e){ console.log('Profile load error:', e); }
+  return null;
+}
+
+function openProfileModal(isEdit){
+  const modal = document.getElementById('profileModal');
+  const cancelBtn = document.getElementById('profCancelBtn');
+  const sub = modal.querySelector('div[style*="pehli baar"], div[style*="Pehli baar"]');
+  
+  if(isEdit){
+    document.getElementById('profFirstName').value = localStorage.getItem('leado_fname')||'';
+    document.getElementById('profLastName').value = localStorage.getItem('leado_lname')||'';
+    document.getElementById('profMobile').value = localStorage.getItem('leado_mobile')||'';
+    document.getElementById('profWhatsApp').value = localStorage.getItem('leado_whatsapp')||'';
+    document.getElementById('profCity').value = localStorage.getItem('leado_city')||'';
+    cancelBtn.style.display = 'block';
+    document.querySelector('#profileModal .modal-title').textContent = '✏️ Profile Edit Karein';
+  } else {
+    document.getElementById('profFirstName').value = '';
+    document.getElementById('profLastName').value = '';
+    document.getElementById('profMobile').value = '';
+    document.getElementById('profWhatsApp').value = '';
+    document.getElementById('profCity').value = '';
+    cancelBtn.style.display = 'none';
+    document.querySelector('#profileModal .modal-title').textContent = '👤 Apna Parichay';
+  }
+  document.getElementById('profErr').style.display = 'none';
+  modal.classList.add('active');
+}
+
+function closeProfileModal(){
+  document.getElementById('profileModal').classList.remove('active');
+}
+
+async function saveProfile(isEdit){
+  const fname = document.getElementById('profFirstName').value.trim();
+  const lname = document.getElementById('profLastName').value.trim();
+  const mobile = document.getElementById('profMobile').value.trim();
+  const err = document.getElementById('profErr');
+  
+  if(!fname || !lname || !mobile || mobile.length < 10){
+    err.style.display = 'block';
+    err.textContent = !fname||!lname ? '⚠️ Naam zaroori hai!' : '⚠️ 10 digit mobile daalo!';
+    return;
+  }
+  err.style.display = 'none';
+  
+  const whatsapp = document.getElementById('profWhatsApp').value.trim() || mobile;
+  const city = document.getElementById('profCity').value.trim() || 'Jaipur';
+  
+  // Save localStorage mein
+  localStorage.setItem('leado_fname', fname);
+  localStorage.setItem('leado_lname', lname);
+  localStorage.setItem('leado_mobile', mobile);
+  localStorage.setItem('leado_whatsapp', whatsapp);
+  localStorage.setItem('leado_city', city);
+  
+  // Firestore mein bhi save karo
+  const profileData = { fname, lname, mobile, whatsapp, city, updatedAt: new Date().toISOString() };
+  await saveUserProfileToFirestore(profileData);
+  
+  // UI update
+  updateUserUI();
+  closeProfileModal();
+  
+  if(isEdit){
+    showToast('✅ Profile update ho gayi!', 'success');
+  } else {
+    showToast('✅ Swagat hai, '+fname+' ji! 🎉', 'success');
+    // Leads load karo
+    await loadFromFirestore();
+    renderHomeDashboard();
+  }
+}
+
+async function checkAndLoadUserProfile(){
+  // Firestore se profile load karo
+  const profile = await loadUserProfileFromFirestore();
+  if(profile && profile.fname){
+    // Profile mili — localStorage mein save karo
+    localStorage.setItem('leado_fname', profile.fname);
+    localStorage.setItem('leado_lname', profile.lname||'');
+    localStorage.setItem('leado_mobile', profile.mobile||'');
+    localStorage.setItem('leado_whatsapp', profile.whatsapp||profile.mobile||'');
+    localStorage.setItem('leado_city', profile.city||'Jaipur');
+    updateUserUI();
+    return true;
+  } else {
+    // Pehli baar — profile form dikhao
+    openProfileModal(false);
+    return false;
+  }
+}
+
 
 async function syncToFirestore(){
   try{
@@ -1207,9 +1711,14 @@ function updateFirebaseUI(user){
 }
 
 // Auth state change pe UI update
-window.addEventListener('fbUserReady', (e)=>{
+window.addEventListener('fbUserReady', async (e)=>{
   updateFirebaseUI(e.detail);
-  loadFromFirestore();
+  // Pehle profile check karo — phir leads load karo
+  const hasProfile = await checkAndLoadUserProfile();
+  if(hasProfile){
+    await loadFromFirestore();
+    renderHomeDashboard();
+  }
 });
 window.addEventListener('fbUserSignedOut', ()=>{ updateFirebaseUI(null); });
 function generateId(){return Date.now().toString(36)+Math.random().toString(36).substr(2)}
@@ -1258,8 +1767,10 @@ function renderLeads(){
     const ms=!q||l.name.toLowerCase().includes(q)||l.phone.includes(q)||(l.project||'').toLowerCase().includes(q)||(l.area||'').toLowerCase().includes(q);
     return mf&&ms;
   }).sort((a,b)=>{const o={hot:0,warm:1,cold:2,converted:3};return(o[a.status]||2)-(o[b.status]||2)});
+  // Speed: Pehle 10 render karo, baad mein baaki
+  window._filteredLeads = filtered;
   const c=document.getElementById('leadsContainer');
-  if(!filtered.length){c.innerHTML=`<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">कोई Lead नहीं मिला</div><div class="empty-sub">+ button से नया lead जोड़ें</div></div>`;return;}
+  if(!filtered.length){c.innerHTML=`<div class="empty-state" style="animation:fadeInUp 0.3s var(--fast)"><div class="empty-icon">📋</div><div class="empty-title">कोई Lead नहीं मिला</div><div class="empty-sub">+ button से नया lead जोड़ें</div></div>`;return;}
   const slabel={hot:'🔥 Ready to Buy',warm:'⭐ Interested',cold:'❄️ Thinking',converted:'✅ Deal Done'};
   c.innerHTML=filtered.map(l=>{
     const isOD=l.nextDate&&new Date(l.nextDate)<new Date()&&l.status!=='converted';
@@ -1480,11 +1991,13 @@ async function saveVisit(){
   leads[idx].lastUpdated=new Date().toISOString();
   if(selectedPhotos.length){leads[idx].visitPhotosLocal=selectedPhotos.map(p=>({dataUrl:p.dataUrl,name:p.name}));}
   saveData();renderLeads();renderVisits();updateStats();closeVisitModal();
-  showToast('🏠 Site Visit save ho gayi!','success');
-  if(selectedPhotos.length&&driveAccessToken){
+  showToast('🏠 Site Visit save ho gayi!','success'); setTimeout(()=>showConfetti(50,50),200);
+  if(selectedPhotos.length && typeof driveAccessToken !== 'undefined' && driveAccessToken){
     const leadName=leads[idx].name.replace(/\s+/g,'_');
-    const driveLinks=await uploadPhotosToDrive(visitingId,leadName);
-    if(driveLinks.length){const i=leads.findIndex(l=>l.id===visitingId);if(i!==-1){leads[i].visitPhotos=driveLinks;leads[i].visitPhotosLocal=null;saveData();}}
+    try{
+      const driveLinks=await uploadPhotosToDrive(visitingId,leadName);
+      if(driveLinks.length){const i=leads.findIndex(l=>l.id===visitingId);if(i!==-1){leads[i].visitPhotos=driveLinks;leads[i].visitPhotosLocal=null;saveData();}}
+    }catch(e){console.log('Photo upload skip:',e);}
   }
   selectedPhotos=[];
 }
@@ -1634,6 +2147,9 @@ function saveCallRecord(){
   const followupDate=document.getElementById('callFollowupDate').value;let addedFollowup=false;
   if(followupChecked&&followupDate){leads[idx].nextDate=followupDate;leads[idx].nextTime=document.getElementById('callFollowupTime').value||'10:00';leads[idx].nextNote=document.getElementById('callFollowupNote').value.trim()||callRecord.notes||'';addedFollowup=true;}
   saveData();renderLeads();renderVisits();renderFollowups();updateStats();closeCallModal();
+  // Call ke baad follow-up notification schedule karo
+  const calledLead = leads.find(l=>l.id===callingId);
+  if(calledLead && calledLead.nextDate && calledLead.nextTime) scheduleFollowupNotification(calledLead);
   renderHomeDashboard();
   const resultLabels={connected:'✅ Baat hui',not_answered:'❌ Nahi utha',busy:'🔴 Busy',call_later:'⏰ Baad mein'};
   let msg=`📞 Call record ho gayi — ${resultLabels[selectedCallResult]}`;
@@ -2284,6 +2800,13 @@ window.addEventListener('load', () => {
     splash.classList.add('hide');
     setTimeout(() => {
       splash.style.display = 'none';
+      // Pehli baar ya agar naam nahi hai toh onboarding dikhao
+      const savedName = localStorage.getItem('leado_fname');
+      if(!savedName || savedName.trim() === '' || savedName === 'Agent'){
+        document.getElementById('onboardScreen').classList.add('show');
+        return;
+      }
+      updateUserUI();
       initPinLock();
     }, 600);
   }, 2200);
@@ -2363,6 +2886,10 @@ function pinForgot() {
 }
 
 // Settings mein PIN change
+function editProfile(){
+  openProfileModal(true);
+}
+
 function changePin() {
   const oldPin = prompt('Purana PIN enter karein:');
   if (!oldPin) return;
@@ -2552,7 +3079,7 @@ async function aiCallScript() {
   await new Promise(r => setTimeout(r, 1000));
 
   const scripts = {
-    'Pehli baar call': `📞 CALLING SCRIPT — Pehli Baar\n\n"Namaskar! ${name} ji se baat ho rahi hai?\n\nMain Krishan bol raha hoon — Jaipur mein ${proj} ka agent hoon.\n\nSir, aapne recently hamare project ke baare mein enquiry ki thi — toh socha ek baar personally connect karoon.\n\n${proj} mein abhi kuch limited plots available hain — Army Area ke ekdum paas, RERA approved, aur payment plan bhi bahut flexible hai.\n\nSir, kya aap kabhi Jaipur mein property le ne ke baare mein socha hai?\n\n[PAUSE — unka jawab suno]\n\nBilkul sir! Kya main aapko ek baar site dikha sakta hoon — koi commitment nahi, bas ek informal visit? Is weekend free hain aap?"`,
+    'Pehli baar call': `📞 CALLING SCRIPT — Pehli Baar\n\n"Namaskar! ${name} ji se baat ho rahi hai?\n\nMain "+getUserFirstName()+" bol raha hoon — "+getUserCity()+" mein — Jaipur mein ${proj} ka agent hoon.\n\nSir, aapne recently hamare project ke baare mein enquiry ki thi — toh socha ek baar personally connect karoon.\n\n${proj} mein abhi kuch limited plots available hain — Army Area ke ekdum paas, RERA approved, aur payment plan bhi bahut flexible hai.\n\nSir, kya aap kabhi Jaipur mein property le ne ke baare mein socha hai?\n\n[PAUSE — unka jawab suno]\n\nBilkul sir! Kya main aapko ek baar site dikha sakta hoon — koi commitment nahi, bas ek informal visit? Is weekend free hain aap?"`,
     'Follow-up call': `📞 FOLLOW-UP SCRIPT\n\n"Namaskar ${name} ji! Main Krishan — ${proj} se.\n\nSir, pichli baar baat hui thi — kaisa chal raha hai?\n\n[PAUSE]\n\nSir, main isliye call kar raha tha — hamare ${proj} mein 2-3 plots jo aapke budget mein the, woh ab almost book ho rahe hain.\n\nAapka interest tha toh socha pehle aapko inform karoon.\n\nSir, kya aap kal ya parson ek baar site dekhne aa sakte hain? Main personally available rahoon ga — aapko poori detail dunga.\n\n[Agar hesitation ho]: Sir, koi bhi final decision nahi karna — bas ek baar physically dekh lena. Kaafi cheezein clear ho jaati hain visit ke baad."`,
     'Price negotiation': `📞 NEGOTIATION SCRIPT\n\n"${name} ji, main samajhta hoon price ko lekar aapki concern hai.\n\nSir, honestly bolunga — market mein ${proj} se better value kahi nahi milegi is price range mein.\n\nDekhiye:\n✅ Location — Army Area, fastest growing zone\n✅ RERA Approved — 100% safe investment  \n✅ Appreciation — next 2 years mein 25-30% value badhegi\n\nSir, agar aap abhi book karte ho toh main personally ensure karoonga ki best deal mile.\n\nEk kaam karo — kal site aao, baith ke sab discuss karte hain. Deal hogi ya nahi, yeh baad mein — pehle property dekhte hain.\n\nKab aa sakte ho?"`
   };
@@ -2572,7 +3099,21 @@ function renderHomeDashboard() {
 
   // Greeting
   const greet = hour < 12 ? 'Subah ki shubhkaamnaayein' : hour < 17 ? 'Dopahar mein swagat hai' : 'Shaam ko namaskar';
-  document.getElementById('homeGreeting').textContent = greet + ', Krishan ji! 👋';
+  const uname = getUserFirstName();
+  document.getElementById('homeGreeting').textContent = greet + ', ' + (uname && uname!=='Agent' ? uname : 'Agent') + ' ji! 👋';
+  
+  // Motivational quotes
+  const quotes = [
+    '"Har call ek naya mauka hai!" 💪',
+    '"Aaj ki mehnat, kal ki safalta!" 🌟',
+    '"Ek aur lead, ek aur deal!" 🏠',
+    '"Follow-up hi closing hai!" 📞',
+    '"Jaipur ka best agent aap ho!" 🏆',
+    '"Consistent raho, results aayenge!" 🎯',
+    '"Har na se deal ke kareeb ho!" 💡',
+  ];
+  const qEl = document.getElementById('motivQuote');
+  if(qEl) qEl.textContent = quotes[new Date().getDay() % quotes.length];
 
   // Today stats
   const todayFollowups = leads.filter(l => l.nextDate === today && l.status !== 'converted');
@@ -2755,6 +3296,334 @@ renderHomeDashboard();
     }, true);
   });
 })();
+
+// ===== PREMIUM UX FUNCTIONS =====
+
+// Ripple effect — har button pe
+function addRipple(e){
+  const btn = e.currentTarget;
+  const existing = btn.querySelector('.ripple-effect');
+  if(existing) existing.remove();
+  const ripple = document.createElement('span');
+  ripple.className = 'ripple-effect';
+  const rect = btn.getBoundingClientRect();
+  const size = Math.max(rect.width, rect.height) * 2;
+  ripple.style.cssText = 'width:'+size+'px;height:'+size+'px;left:'+(e.clientX-rect.left-size/2)+'px;top:'+(e.clientY-rect.top-size/2)+'px;';
+  btn.appendChild(ripple);
+  setTimeout(()=>ripple.remove(), 600);
+}
+
+// Sab buttons pe ripple add karo
+document.addEventListener('DOMContentLoaded', function(){
+  document.querySelectorAll('.btn-primary,.btn-purple,.action-btn,.bottom-nav-item,.icon-btn').forEach(btn=>{
+    btn.addEventListener('click', addRipple);
+  });
+});
+
+// Confetti — lead save hone pe
+function showConfetti(x, y){
+  const colors = ['#d4a843','#f0c96a','#00d4aa','#ff4d6d','#a78bfa','#4d9fff','#ffffff'];
+  for(let i=0; i<18; i++){
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.cssText = 
+      'left:'+(x||50)+'%;top:'+(y||30)+'%;'+
+      'background:'+colors[Math.floor(Math.random()*colors.length)]+';'+
+      'transform:rotate('+Math.random()*360+'deg);'+
+      'animation-delay:'+Math.random()*0.3+'s;'+
+      'animation-duration:'+(0.8+Math.random()*0.6)+'s;'+
+      'width:'+(6+Math.random()*6)+'px;height:'+(6+Math.random()*6)+'px;';
+    document.body.appendChild(piece);
+    setTimeout(()=>piece.remove(), 1500);
+  }
+}
+
+// Premium toast — icon ke saath
+const _origToast = window.showToast;
+function showToast(msg, type=''){
+  const t = document.getElementById('toast');
+  const icons = {success:'✅', error:'❌', '':'💬'};
+  t.textContent = msg;
+  t.className = 'toast show ' + type;
+  // Vibration — mobile pe
+  if(navigator.vibrate){
+    if(type==='success') navigator.vibrate([10,50,10]);
+    else navigator.vibrate(10);
+  }
+  clearTimeout(window._toastTimer);
+  window._toastTimer = setTimeout(()=>t.className='toast', 3000);
+}
+
+// Stat counter animation
+function animateCounter(el, target){
+  const start = parseInt(el.textContent)||0;
+  const duration = 400;
+  const startTime = performance.now();
+  function update(now){
+    const elapsed = now - startTime;
+    const progress = Math.min(elapsed/duration, 1);
+    const eased = 1 - Math.pow(1-progress, 3);
+    el.textContent = Math.round(start + (target-start)*eased);
+    if(progress < 1) requestAnimationFrame(update);
+    else el.textContent = target;
+  }
+  requestAnimationFrame(update);
+}
+
+// Premium updateStats — animated counters
+const _origUpdateStats = window.updateStats;
+
+// Skeleton loader
+function showSkeletonLoading(){
+  const container = document.getElementById('leadsContainer');
+  if(!container) return;
+  container.innerHTML = [1,2,3].map(()=>`
+    <div style="background:var(--bg-card);border-radius:16px;padding:14px;margin-bottom:12px;border:1px solid var(--border)">
+      <div class="skeleton" style="height:18px;width:60%;margin-bottom:10px"></div>
+      <div class="skeleton" style="height:12px;width:40%;margin-bottom:8px"></div>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        ${[1,2,3,4].map(()=>'<div class="skeleton" style="height:32px;flex:1;border-radius:8px"></div>').join('')}
+      </div>
+    </div>`).join('');
+}
+
+// Lead save hone pe confetti
+const _origSaveLead = window.saveLead;
+
+
+
+// ===== SWIPE GESTURE — Tab navigation =====
+(function(){
+  const TAB_ORDER = ['home','leads','followup','summary','ai'];
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let touchStartTime = 0;
+  let currentTabIndex = 0;
+  
+  // Current active tab track karo
+  function getCurrentTabIndex(){
+    const active = document.querySelector('.bottom-nav-item.active');
+    if(!active) return 0;
+    const id = active.id.replace('bn-','');
+    return Math.max(0, TAB_ORDER.indexOf(id));
+  }
+  
+  // Swipe se tab change karo — animation ke saath
+  function swipeToTab(direction){
+    currentTabIndex = getCurrentTabIndex();
+    let newIndex;
+    if(direction === 'left'){
+      newIndex = Math.min(currentTabIndex + 1, TAB_ORDER.length - 1);
+    } else {
+      newIndex = Math.max(currentTabIndex - 1, 0);
+    }
+    
+    if(newIndex === currentTabIndex) return;
+    
+    const newTab = TAB_ORDER[newIndex];
+    
+    // Slide animation
+    const mainContent = document.querySelector('.main-content');
+    if(mainContent){
+      mainContent.style.transition = 'transform 0.25s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.2s';
+      mainContent.style.transform = direction === 'left' ? 'translateX(-15px)' : 'translateX(15px)';
+      mainContent.style.opacity = '0.7';
+      setTimeout(()=>{
+        switchTabByName(newTab);
+        mainContent.style.transform = direction === 'left' ? 'translateX(15px)' : 'translateX(-15px)';
+        setTimeout(()=>{
+          mainContent.style.transition = 'transform 0.25s cubic-bezier(0.25,0.46,0.45,0.94), opacity 0.2s';
+          mainContent.style.transform = 'translateX(0)';
+          mainContent.style.opacity = '1';
+        }, 30);
+      }, 150);
+    } else {
+      switchTabByName(newTab);
+    }
+    
+    // Haptic feedback
+    if(navigator.vibrate) navigator.vibrate(8);
+  }
+  
+  // Touch events
+  const mainEl = document.body;
+  
+  mainEl.addEventListener('touchstart', function(e){
+    // Input fields pe swipe disable karo
+    if(e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+    // Modal open hai toh swipe disable
+    if(document.querySelector('.modal-overlay.active')) return;
+    
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    touchStartTime = Date.now();
+  }, {passive: true});
+  
+  mainEl.addEventListener('touchend', function(e){
+    if(!touchStartX) return;
+    if(document.querySelector('.modal-overlay.active')) return;
+    
+    const touchEndX = e.changedTouches[0].clientX;
+    const touchEndY = e.changedTouches[0].clientY;
+    const diffX = touchStartX - touchEndX;
+    const diffY = Math.abs(touchStartY - touchEndY);
+    const elapsed = Date.now() - touchStartTime;
+    
+    // Conditions:
+    // 1. Horizontal swipe > 60px
+    // 2. Vertical movement < 50px (scroll nahi)
+    // 3. Fast swipe < 400ms
+    if(Math.abs(diffX) > 60 && diffY < 50 && elapsed < 400){
+      if(diffX > 0){
+        swipeToTab('left');   // Left swipe → agla tab
+      } else {
+        swipeToTab('right');  // Right swipe → pichla tab
+      }
+    }
+    
+    touchStartX = 0;
+  }, {passive: true});
+  
+  // Tab indicator — bottom mein swipe hint
+  function showSwipeHint(){
+    const hint = document.createElement('div');
+    hint.style.cssText = 'position:fixed;bottom:75px;left:50%;transform:translateX(-50%);background:rgba(212,168,67,0.9);color:#0a0f1a;font-size:11px;padding:6px 14px;border-radius:20px;z-index:999;font-family:Noto Sans Devanagari,sans-serif;font-weight:600;pointer-events:none;animation:fadeInUp 0.3s ease,fadeIn 0.3s ease;white-space:nowrap';
+    hint.textContent = '← Swipe karke tabs badlein →';
+    document.body.appendChild(hint);
+    setTimeout(()=>{ hint.style.opacity='0'; hint.style.transition='opacity 0.5s'; setTimeout(()=>hint.remove(),500); }, 2500);
+  }
+  
+  // Pehli baar hint dikhao
+  if(!localStorage.getItem('swipe_hint_shown')){
+    setTimeout(showSwipeHint, 3000);
+    localStorage.setItem('swipe_hint_shown','1');
+  }
+})();
+
+
+// ===== ONESIGNAL NOTIFICATIONS =====
+const OS_APP_ID = '69f0132e-f799-4456-9a82-98c255827e3d';
+const OS_REST_API_KEY = 'os_v2_app_69f0132ef79944569a8298c255827e3d'; // Update this later
+
+// Follow-up reminder schedule karo
+async function scheduleFollowupNotification(lead){
+  if(!lead.nextDate || !lead.nextTime) return;
+  
+  try{
+    // Date + Time combine karo
+    const notifDateTime = new Date(lead.nextDate + 'T' + (lead.nextTime||'09:00') + ':00');
+    const now = new Date();
+    
+    // Past time hai toh skip karo
+    if(notifDateTime <= now) return;
+    
+    // Local notification schedule karo — Service Worker use karega
+    const delay = notifDateTime.getTime() - now.getTime();
+    
+    // Notification data localStorage mein save karo
+    const notifs = JSON.parse(localStorage.getItem('scheduled_notifs')||'[]');
+    // Purani notification remove karo same lead ki
+    const filtered = notifs.filter(n => n.leadId !== lead.id);
+    filtered.push({
+      leadId: lead.id,
+      leadName: lead.name,
+      leadPhone: lead.phone,
+      project: lead.project||'',
+      scheduledTime: notifDateTime.getTime(),
+      message: lead.nextNote || 'Follow-up karna hai!'
+    });
+    localStorage.setItem('scheduled_notifs', JSON.stringify(filtered));
+    
+    // Service Worker ko message bhejo
+    if('serviceWorker' in navigator && navigator.serviceWorker.controller){
+      navigator.serviceWorker.controller.postMessage({
+        type: 'SCHEDULE_NOTIFICATION',
+        data: {
+          leadId: lead.id,
+          title: '📞 Follow-up: ' + lead.name,
+          body: (lead.project?lead.project+' — ':'') + (lead.nextNote||'Aaj call karna hai!'),
+          scheduledTime: notifDateTime.getTime(),
+          delay: delay
+        }
+      });
+    }
+    
+    // Browser setTimeout se bhi schedule karo (app open ho tab)
+    if(delay > 0 && delay < 24*60*60*1000){ // 24 hours ke andar
+      clearTimeout(window['notif_'+lead.id]);
+      window['notif_'+lead.id] = setTimeout(function(){
+        showBrowserNotification(
+          '📞 Follow-up: ' + lead.name,
+          (lead.project?lead.project+' — ':'') + (lead.nextNote||'Aaj call karna hai!'),
+          lead.id
+        );
+      }, delay);
+    }
+    
+    console.log('Notification scheduled for:', lead.name, 'at', notifDateTime);
+  } catch(e){ console.log('Notification schedule error:', e); }
+}
+
+// Browser notification dikhao
+function showBrowserNotification(title, body, leadId){
+  if(!('Notification' in window)) return;
+  if(Notification.permission !== 'granted'){
+    Notification.requestPermission().then(p => {
+      if(p === 'granted') showBrowserNotification(title, body, leadId);
+    });
+    return;
+  }
+  const notif = new Notification(title, {
+    body: body,
+    icon: 'https://krishanjhajharia3-svg.github.io/re-dary/icon-192.png',
+    badge: 'https://krishanjhajharia3-svg.github.io/re-dary/icon-192.png',
+    tag: 'followup-' + leadId,
+    requireInteraction: true,
+    vibrate: [200, 100, 200]
+  });
+  notif.onclick = function(){
+    window.focus();
+    editLead(leadId);
+    notif.close();
+  };
+  // Haptic
+  if(navigator.vibrate) navigator.vibrate([200,100,200]);
+}
+
+// Sab leads ke notifications schedule karo
+function scheduleAllNotifications(){
+  const today = new Date().toISOString().split('T')[0];
+  const upcomingLeads = leads.filter(l => 
+    l.nextDate && l.nextDate >= today && 
+    l.status !== 'converted' && l.nextTime
+  );
+  upcomingLeads.forEach(l => scheduleFollowupNotification(l));
+  if(upcomingLeads.length > 0){
+    console.log('Scheduled notifications for', upcomingLeads.length, 'leads');
+  }
+}
+
+// Notification permission maango
+function requestNotificationPermission(){
+  if(!('Notification' in window)) return;
+  if(Notification.permission === 'default'){
+    Notification.requestPermission().then(permission => {
+      if(permission === 'granted'){
+        showToast('🔔 Notifications ON! Follow-up pe reminder milega!', 'success');
+        scheduleAllNotifications();
+      }
+    });
+  }
+}
+
+// App load hone pe notifications check karo
+window.addEventListener('load', function(){
+  setTimeout(function(){
+    requestNotificationPermission();
+    scheduleAllNotifications();
+  }, 5000);
+});
+
 </script>
 </body>
 </html>
