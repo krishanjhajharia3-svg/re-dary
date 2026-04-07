@@ -2810,7 +2810,30 @@ window.addEventListener('load',()=>{setTimeout(()=>{initGoogleAuth();initDriveAu
 
 ['leadModal','contactModal','visitModal','exportModal','callModal','callHistoryModal'].forEach(id=>{document.getElementById(id).addEventListener('click',function(e){if(e.target===this)this.classList.remove('active');});});
 
-if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+if('serviceWorker' in navigator){
+  window.addEventListener('load', function(){
+    // OneSignal SW register karo
+    navigator.serviceWorker.register('/OneSignalSDKWorker.js', {scope: '/'})
+      .then(function(reg){
+        console.log('SW registered:', reg.scope);
+        // SW ready hone ka wait karo
+        return navigator.serviceWorker.ready;
+      })
+      .then(function(reg){
+        console.log('SW ready!');
+        // Ab notifications schedule karo
+        setTimeout(scheduleAllNotifications, 1000);
+      })
+      .catch(function(err){ console.log('SW error:', err); });
+  });
+  
+  // SW se message receive karo
+  navigator.serviceWorker.addEventListener('message', function(e){
+    if(e.data && e.data.type === 'OPEN_LEAD'){
+      editLead(e.data.leadId);
+    }
+  });
+}
 
 function checkNotifications(){
   const today=new Date().toISOString().split('T')[0];
