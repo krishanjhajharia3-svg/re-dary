@@ -2272,6 +2272,8 @@ async function saveVisit(){
   leads[idx].lastUpdated=new Date().toISOString();
   if(selectedPhotos.length){leads[idx].visitPhotosLocal=selectedPhotos.map(p=>({dataUrl:p.dataUrl,name:p.name}));}
   saveData();renderLeads();renderVisits();updateStats();closeVisitModal();
+  // ✅ Visits tab pe wapas jao
+  switchTabByName('visits');updateBottomNav('visits');
   showToast('🏠 Site Visit save ho gayi!','success'); setTimeout(()=>showConfetti(50,50),200);
   if(selectedPhotos.length && typeof driveAccessToken !== 'undefined' && driveAccessToken){
     const leadName=leads[idx].name.replace(/\s+/g,'_');
@@ -2365,6 +2367,8 @@ function saveLead(){
   if(editingId){const idx=leads.findIndex(l=>l.id===editingId);if(idx!==-1)leads[idx]={...leads[idx],...ld};showToast('✅ Lead update ho gaya!','success');}
   else{ld.id=generateId();ld.createdAt=new Date().toISOString();leads.unshift(ld);showToast('✅ Lead save ho gaya!','success');}
   saveData();renderLeads();renderFollowups();updateStats();closeModal();
+  // ✅ Leads tab pe wapas jao
+  switchTabByName('leads');updateBottomNav('leads');
   renderHomeDashboard();
   // Refresh AI lead selects
   populateAiLeadSelects();
@@ -2381,6 +2385,7 @@ function deleteLead(){
   leads=leads.filter(l=>l.id!==editingId);
   saveData();renderLeads();renderFollowups();renderVisits();updateStats();closeModal();
   populateAiLeadSelects();
+  switchTabByName('leads');updateBottomNav('leads');
   showToast('🗑️ Lead delete ho gaya');
 }
 
@@ -2433,6 +2438,8 @@ function saveCallRecord(){
   const followupDate=document.getElementById('callFollowupDate').value;let addedFollowup=false;
   if(followupChecked&&followupDate){leads[idx].nextDate=followupDate;leads[idx].nextTime=document.getElementById('callFollowupTime').value||'10:00';leads[idx].nextNote=document.getElementById('callFollowupNote').value.trim()||callRecord.notes||'';addedFollowup=true;}
   saveData();renderLeads();renderVisits();renderFollowups();updateStats();closeCallModal();
+  // ✅ Leads tab pe wapas jao
+  switchTabByName('leads');updateBottomNav('leads');
   // Call ke baad follow-up notification schedule karo
   const calledLead = leads.find(l=>l.id===callingId);
   if(calledLead && calledLead.nextDate && calledLead.nextTime) scheduleFollowupNotification(calledLead);
