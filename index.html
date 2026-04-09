@@ -878,9 +878,6 @@ body{font-family:'Noto Sans Devanagari','Rajdhani',sans-serif;background:var(--b
 <div class="notif-popup" id="notifPopup">
   <div class="notif-title">📅 Aaj Ke Follow-ups</div>
   <div id="notifList"></div>
-  <div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(255,255,255,0.1)">
-    <button onclick="testNotification();closeNotifPopup()" style="width:100%;padding:8px;border-radius:8px;border:1px solid rgba(0,229,184,.3);background:rgba(0,229,184,.08);color:#00e5b8;font-size:12px;cursor:pointer;margin-bottom:6px">🔔 Test Notification Bhejo</button>
-  </div>
   <div class="notif-close" onclick="closeNotifPopup()">✕ Band Karein</div>
 </div>
 
@@ -2603,39 +2600,17 @@ window.addEventListener('load',()=>{setTimeout(()=>{initGoogleAuth();initDriveAu
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){
 
-    // 1. firebase-messaging-sw.js — FCM background notifications
-    // Relative path use karo — GitHub Pages pe / kaam nahi karta
-    navigator.serviceWorker.register('./firebase-messaging-sw.js')
+    // 1. firebase-messaging-sw.js — FCM background notifications (MOST IMPORTANT!)
+    navigator.serviceWorker.register('/firebase-messaging-sw.js', {scope: '/'})
       .then(function(reg){
-        console.log('[FCM SW] Registered! Scope:', reg.scope);
+        console.log('[FCM SW] firebase-messaging-sw.js registered!');
+        // FCM token ko is SW se link karo
         window._swRegistration = reg;
-        // FCM token get karo is SW se
-        if(window._fbMessaging && window._fbFunctions){
-          import('https://www.gstatic.com/firebasejs/10.12.0/firebase-messaging.js').then(function(mod){
-            mod.getToken(window._fbMessaging, {
-              vapidKey: 'BIWp7MB4UU6R-OLHn16Tq2Uld8M3fAkNeMzGMaR07YVPMbVgNY8iPHpNoDIxdfEPjDfWXCdbX8Wd3gtraB809S8',
-              serviceWorkerRegistration: reg
-            }).then(function(token){
-              if(token){
-                window._fcmToken = token;
-                console.log('[FCM SW] Token linked to SW:', token.substring(0,20)+'...');
-                // Firestore mein save karo
-                if(window._fbUser && window._fbFunctions){
-                  var db = window._fbDb;
-                  var fn = window._fbFunctions;
-                  fn.setDoc(fn.doc(db,'fcm_tokens',window._fbUser.uid),{
-                    token:token, platform:'web', updatedAt:new Date().toISOString()
-                  }).then(function(){ console.log('[FCM SW] Token saved to Firestore'); });
-                }
-              }
-            }).catch(function(e){ console.log('[FCM SW] Token error:', e.message); });
-          });
-        }
       })
-      .catch(function(err){ console.log('[FCM SW] Register Error:', err.message); });
+      .catch(function(err){ console.log('[FCM SW] Error:', err); });
 
-    // 2. Custom sw.js — caching
-    navigator.serviceWorker.register('./sw.js')
+    // 2. Custom sw.js — caching + push fallback
+    navigator.serviceWorker.register('/sw.js', {scope: '/'})
       .then(function(reg){
         console.log('[SW] Custom sw.js registered:', reg.scope);
         return navigator.serviceWorker.ready;
@@ -2644,12 +2619,12 @@ if('serviceWorker' in navigator){
         console.log('[SW] Ready! Scheduling notifications...');
         setTimeout(scheduleAllNotifications, 1000);
       })
-      .catch(function(err){ console.log('[SW] Error:', err.message); });
+      .catch(function(err){ console.log('[SW] Error:', err); });
 
     // 3. OneSignal SW
-    navigator.serviceWorker.register('./OneSignalSDKWorker.js')
-      .then(function(reg){ console.log('[OneSignal SW] Registered!', reg.scope); })
-      .catch(function(err){ console.log('[OneSignal SW] Error:', err.message); });
+    navigator.serviceWorker.register('/OneSignalSDKWorker.js', {scope: '/'})
+      .then(function(reg){ console.log('[OneSignal SW] Registered!'); })
+      .catch(function(err){ console.log('[OneSignal SW] Error:', err); });
   });
 
   // SW se message receive karo
@@ -3329,8 +3304,7 @@ async function scheduleFollowupNotification(lead){
     }
     
     // Browser setTimeout se bhi schedule karo (app open ho tab)
-    // 7 din tak ka timeout support karo
-    if(delay > 0 && delay < 7*24*60*60*1000){
+    if(delay > 0 && delay < 24*60*60*1000){ // 24 hours ke andar
       clearTimeout(window['notif_'+lead.id]);
       window['notif_'+lead.id] = setTimeout(function(){
         showBrowserNotification(
@@ -3371,71 +3345,14 @@ function showBrowserNotification(title, body, leadId){
   if(navigator.vibrate) navigator.vibrate([200,100,200]);
 }
 
-
-// ===== TEST NOTIFICATION =====
-function testNotification(){
-  // Step 1: Check support
-  if(!('Notification' in window)){
-    showToast('❌ Yeh browser notifications support nahi karta');
-    return;
-  }
-  
-  // Step 2: Permission check
-  if(Notification.permission === 'denied'){
-    showToast('🔕 Notifications BLOCKED hain! Phone Settings > Chrome > Site Settings > Notifications mein Allow karein', '');
-    return;
-  }
-  
-  // Step 3: Permission maango agar default hai
-  if(Notification.permission === 'default'){
-    Notification.requestPermission().then(function(perm){
-      if(perm === 'granted'){
-        showToast('✅ Permission mili! Test notification aa raha hai...', 'success');
-        setTimeout(function(){ fireTestNotif(); }, 1000);
-      } else {
-        showToast('❌ Permission nahi di — notifications nahi aayenge');
-      }
-    });
-    return;
-  }
-  
-  // Step 4: Already granted - fire karo
-  fireTestNotif();
-}
-
-function fireTestNotif(){
-  try{
-    const notif = new Notification('🔔 Leado Test Notification', {
-      body: 'Notification kaam kar raha hai! Follow-up reminders milenge.',
-      icon: 'https://krishanjhajharia3-svg.github.io/icon-192.png',
-      badge: 'https://krishanjhajharia3-svg.github.io/icon-192.png',
-      tag: 'test-notif',
-      requireInteraction: false,
-      vibrate: [200, 100, 200]
-    });
-    notif.onclick = function(){ window.focus(); notif.close(); };
-    showToast('✅ Test notification bheja! Dekho aaya ya nahi', 'success');
-    // Status update
-    localStorage.setItem('notif_test_done', new Date().toISOString());
-  } catch(err){
-    showToast('❌ Notification error: ' + err.message);
-    console.error('Test notif error:', err);
-  }
-}
-// ===== END TEST NOTIFICATION =====
-
 // Sab leads ke notifications schedule karo
 function scheduleAllNotifications(){
   const today = new Date().toISOString().split('T')[0];
-  // nextTime optional — nahi hai toh 09:00 default use karo
-  const upcomingLeads = leads.filter(l =>
-    l.nextDate && l.nextDate >= today &&
-    l.status !== 'converted'
+  const upcomingLeads = leads.filter(l => 
+    l.nextDate && l.nextDate >= today && 
+    l.status !== 'converted' && l.nextTime
   );
-  upcomingLeads.forEach(function(l){
-    if(!l.nextTime) l = Object.assign({}, l, {nextTime:'09:00'});
-    scheduleFollowupNotification(l);
-  });
+  upcomingLeads.forEach(l => scheduleFollowupNotification(l));
   if(upcomingLeads.length > 0){
     console.log('Scheduled notifications for', upcomingLeads.length, 'leads');
   }
@@ -3443,34 +3360,15 @@ function scheduleAllNotifications(){
 
 // Notification permission maango
 function requestNotificationPermission(){
-  if(!('Notification' in window)){
-    console.log('Notifications not supported');
-    return;
+  if(!('Notification' in window)) return;
+  if(Notification.permission === 'default'){
+    Notification.requestPermission().then(permission => {
+      if(permission === 'granted'){
+        showToast('🔔 Notifications ON! Follow-up pe reminder milega!', 'success');
+        scheduleAllNotifications();
+      }
+    });
   }
-  if(Notification.permission === 'granted'){
-    // Already granted - schedule karo
-    scheduleAllNotifications();
-    checkTodayFollowupsNotif();
-    return;
-  }
-  if(Notification.permission === 'denied'){
-    // User ne block kiya hai - guide karo
-    console.log('Notifications blocked by user');
-    // App mein badge dikhao
-    const badge = document.getElementById('notifBadge');
-    if(badge) badge.title = 'Notifications blocked - Settings mein allow karein';
-    return;
-  }
-  // Default - permission maango
-  Notification.requestPermission().then(function(permission){
-    if(permission === 'granted'){
-      showToast('🔔 Notifications ON! Follow-up reminders milenge!', 'success');
-      scheduleAllNotifications();
-      setTimeout(checkTodayFollowupsNotif, 2000);
-    } else {
-      console.log('Notification permission denied');
-    }
-  });
 }
 
 // App load hone pe notifications check karo
@@ -3478,55 +3376,8 @@ window.addEventListener('load', function(){
   setTimeout(function(){
     requestNotificationPermission();
     scheduleAllNotifications();
-    checkTodayFollowupsNotif(); // Aaj ke follow-ups check karo
   }, 5000);
 });
-
-// ===== RELIABLE TODAY FOLLOWUP CHECK =====
-// Yeh function app open hone pe check karta hai
-// Agar aaj ka follow-up hai toh browser notification dikhata hai
-function checkTodayFollowupsNotif(){
-  if(!('Notification' in window)) return;
-  if(Notification.permission !== 'granted') return;
-  
-  const today = new Date().toISOString().split('T')[0];
-  const lastCheck = localStorage.getItem('notif_last_check');
-  
-  // Ek din mein ek baar hi check karo
-  if(lastCheck === today) return;
-  
-  const todayLeads = leads.filter(l =>
-    l.nextDate === today && l.status !== 'converted'
-  );
-  
-  const overdueLeads = leads.filter(l =>
-    l.nextDate && l.nextDate < today && l.status !== 'converted'
-  );
-  
-  if(todayLeads.length > 0){
-    const names = todayLeads.slice(0,3).map(l=>l.name).join(', ');
-    const extra = todayLeads.length > 3 ? ' +' + (todayLeads.length-3) + ' aur' : '';
-    setTimeout(function(){
-      showBrowserNotification(
-        '📅 Aaj ke Follow-Ups: ' + todayLeads.length,
-        names + extra + ' — Call karna mat bhoolo!',
-        todayLeads[0].id
-      );
-    }, 2000);
-  }
-  
-  if(overdueLeads.length > 0){
-    setTimeout(function(){
-      showBrowserNotification(
-        '⚠️ ' + overdueLeads.length + ' Overdue Follow-Ups!',
-        overdueLeads.slice(0,2).map(l=>l.name).join(', ') + ' — Abhi call karein!',
-        overdueLeads[0].id
-      );
-    }, 5000);
-  }
-  
-  localStorage.setItem('notif_last_check', today);
-}
 
 // TWA ke liye — splash screen ke baad seedha permission maango
 window.addEventListener('load', function(){
@@ -3536,30 +3387,18 @@ window.addEventListener('load', function(){
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
     
     if((isAndroid || isStandalone) && 'Notification' in window){
-      if(Notification.permission === 'granted'){
-        // Already on - sirf schedule karo
-        scheduleAllNotifications();
-        setTimeout(checkTodayFollowupsNotif, 3000);
-      } else if(Notification.permission === 'default'){
+      if(Notification.permission === 'default'){
+        // Seedha native permission dialog dikhao
         Notification.requestPermission().then(function(permission){
           if(permission === 'granted'){
             showToast('🔔 Notifications ON! Follow-up reminders milenge!', 'success');
             scheduleAllNotifications();
-            setTimeout(checkTodayFollowupsNotif, 2000);
+            // OneSignal bhi subscribe karo
             if(typeof OneSignal !== 'undefined'){
-              try { OneSignal.User.PushSubscription.optIn(); } catch(e){}
+              OneSignal.User.PushSubscription.optIn();
             }
           }
         });
-      } else if(Notification.permission === 'denied'){
-        // Pehli baar - sirf ek baar guide karo
-        const guided = localStorage.getItem('notif_guide_shown');
-        if(!guided){
-          setTimeout(function(){
-            showToast('🔕 Notifications blocked hain — Phone Settings > Chrome > Notifications mein Allow karein', '');
-          }, 4000);
-          localStorage.setItem('notif_guide_shown', '1');
-        }
       }
     }
   }, 3000); // 3 sec baad — splash screen ke baad
