@@ -4339,20 +4339,50 @@ window.addEventListener('load', function(){
     ].join('');
   }
 
-  // Add files
+  // In-memory File store — keeps actual File objects (no base64 needed for share)
+  var _liveFiles = {}; // pid -> [{name, sz, ftype, mime, fileObj, data(thumb only)}]
+
+  function getLiveFiles(pid){ return _liveFiles[pid] || []; }
+
+  // Add files — store File object + thumbnail for images
   window.bpAdd = function(input){
     var pid = input.dataset.pid, ft = input.dataset.ft;
     var files = Array.from(input.files); if(!files.length) return;
-    var d = ld(pid), pending = files.length;
+    if(!_liveFiles[pid]) _liveFiles[pid] = [];
+
+    var pending = files.length;
     for(var i=0;i<files.length;i++){
       (function(file){
-        if(file.size > 25*1024*1024){ showToast('⚠️ '+file.name+' 25MB limit'); pending--; if(!pending){ sd(pid,d); buildPanel(pid); } return; }
-        var r = new FileReader();
-        r.onload = function(e){
-          d.files.push({name:file.name, sz:fs(file.size), ftype:ft, data:e.target.result, mime:file.type});
-          pending--; if(!pending){ sd(pid,d); buildPanel(pid); showToast('✅ '+files.length+' file add hui'); }
-        };
-        r.readAsDataURL(file);
+        if(file.size > 64*1024*1024){
+          showToast('⚠️ '+file.name+' 64MB se badi'); pending--;
+          if(!pending) buildPanel(pid);
+          return;
+        }
+        var entry = {name:file.name, sz:fs(file.size), ftype:ft, mime:file.type, fileObj:file, data:''};
+
+        // For images: generate thumbnail for preview
+        if(ft === 'image'){
+          var r = new FileReader();
+          r.onload = function(e){
+            entry.data = e.target.result;
+            _liveFiles[pid].push(entry);
+            // Also save meta to localStorage (no base64 data — just name/size for persistence hint)
+            var d = ld(pid);
+            d.files.push({name:file.name, sz:fs(file.size), ftype:ft, mime:file.type, data:e.target.result});
+            sd(pid, d);
+            pending--;
+            if(!pending){ buildPanel(pid); showToast('✅ '+files.length+' file add hui'); }
+          };
+          r.readAsDataURL(file);
+        } else {
+          _liveFiles[pid].push(entry);
+          // Save meta to localStorage
+          var d2 = ld(pid);
+          d2.files.push({name:file.name, sz:fs(file.size), ftype:ft, mime:file.type, data:''});
+          sd(pid, d2);
+          pending--;
+          if(!pending){ buildPanel(pid); showToast('✅ '+files.length+' file add hui'); }
+        }
       })(files[i]);
     }
     input.value = '';
@@ -4380,36 +4410,84 @@ window.addEventListener('load', function(){
     }, function(){ showToast('⚠️ Location nahi mili'); });
   };
 
-  // Share with files via Web Share API
+  // Share with files via Web Share API — Robust version
   window.bpShare = function(pid){
     var p = null; for(var i=0;i<PROJS.length;i++){ if(PROJS[i].id===pid){ p=PROJS[i]; break; } }
     var d = ld(pid);
     var nl = '\n';
-    var text = p.name+nl+p.desc+nl+'Rate: '+p.price+nl+(d.loc?'Location: '+d.loc+nl:'')+'Call karein aaj!';
+    var text = p.name+nl+p.desc+nl+'Rate: '+p.price+nl+(d.loc?'Location: '+d.loc+nl:'')+'Call karein!';
 
-    // Convert base64 to File objects (skip video - too large)
+    // No files? Text only
+    if(d.files.length === 0){
+      if(navigator.share){ navigator.share({text:text}).catch(function(){}); }
+      else { bpTxt(pid); }
+      return;
+    }
+
+    // Check Web Share API support
+    if(!navigator.share){
+      showToast('⚠️ Share API not supported — Text WA mein ja raha hai');
+      bpTxt(pid);
+      return;
+    }
+
+    // Use live File objects first (most reliable), fallback to base64
     var fileObjs = [];
     try{
-      var toShare = d.files.filter(function(f){ return f.ftype !== 'video'; }).slice(0,5);
-      for(var i=0;i<toShare.length;i++){
-        var f = toShare[i];
-        var arr = f.data.split(','), mime = arr[0].match(/:(.*?);/)[1];
-        var bstr = atob(arr[1]), n = bstr.length, u8 = new Uint8Array(n);
-        while(n--) u8[n] = bstr.charCodeAt(n);
-        fileObjs.push(new File([u8], f.name, {type: mime}));
+      var live = getLiveFiles(pid).filter(function(f){ return f.ftype !== 'video'; }).slice(0,5);
+      if(live.length > 0){
+        // Use actual File objects — no conversion needed!
+        for(var k=0;k<live.length;k++) fileObjs.push(live[k].fileObj);
+      } else {
+        // Fallback: reconstruct from stored base64
+        for(var i=0;i<d.files.length && fileObjs.length<5;i++){
+          var f = d.files[i];
+          if(f.ftype === 'video' || !f.data) continue;
+          var parts = f.data.split(',');
+          if(parts.length < 2) continue;
+          var mimeM = parts[0].match(/:(.*?);/);
+          if(!mimeM) continue;
+          var mime2 = mimeM[1];
+          var bstr = atob(parts[1]), n2 = bstr.length, u8 = new Uint8Array(n2);
+          while(n2--) u8[n2] = bstr.charCodeAt(n2);
+          fileObjs.push(new File([u8], f.name, {type:mime2}));
+        }
       }
     }catch(e){ fileObjs = []; }
 
-    if(fileObjs.length > 0 && navigator.canShare && navigator.canShare({files:fileObjs, text:text})){
-      navigator.share({files:fileObjs, text:text})
-        .then(function(){ showToast('✅ Share ho gaya!'); })
-        .catch(function(e){ if(e.name !== 'AbortError') bpTxt(pid); });
-    } else if(navigator.share){
-      navigator.share({text:text})
-        .then(function(){ if(fileObjs.length) showToast('📄 Text share hua — files manually attach karein'); })
-        .catch(function(e){ if(e.name !== 'AbortError') bpTxt(pid); });
+    if(fileObjs.length === 0){
+      // Files convert nahi hue — text bhejo
+      showToast('⚠️ Files convert nahi hui, text bhej raha hai');
+      navigator.share({text:text}).catch(function(){});
+      return;
+    }
+
+    // Check canShare with files
+    var canDoFiles = false;
+    try{
+      canDoFiles = navigator.canShare && navigator.canShare({files: fileObjs});
+    }catch(e){ canDoFiles = false; }
+
+    if(canDoFiles){
+      // Share files + text
+      navigator.share({files: fileObjs, text: text})
+        .then(function(){ showToast('✅ Files + message share ho gaya!'); })
+        .catch(function(e){
+          if(e.name === 'AbortError') return; // User ne cancel kiya
+          // Files fail — try text only
+          showToast('⚠️ Files share fail — text bhej raha hai');
+          navigator.share({text:text}).catch(function(){});
+        });
     } else {
-      bpTxt(pid);
+      // canShare false — try anyway, some browsers lie
+      navigator.share({files: fileObjs, text: text})
+        .then(function(){ showToast('✅ Share ho gaya!'); })
+        .catch(function(e){
+          if(e.name === 'AbortError') return;
+          // Really failed — text only
+          showToast('📄 File share nahi hua — text ja raha hai');
+          navigator.share({text:text}).catch(function(){});
+        });
     }
   };
 
