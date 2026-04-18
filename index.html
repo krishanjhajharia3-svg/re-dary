@@ -2184,6 +2184,10 @@ function updateStats(){
   document.getElementById('sumConverted').textContent=cv;
   document.getElementById('sumVisit').textContent=vi;
   document.getElementById('sumTotal').textContent=t;
+  // Unfollowed count — seedha updateStats mein
+  var noDateCount = leads.filter(function(l){ return !l.nextDate; }).length;
+  var fcEl = document.getElementById('fixerCount');
+  if(fcEl) fcEl.textContent = noDateCount;
   const proj={};
   leads.forEach(l=>{const p=l.project||'Other';proj[p]=(proj[p]||0)+1});
   document.getElementById('projectSummary').innerHTML=Object.entries(proj).map(([k,v])=>`
@@ -3540,6 +3544,8 @@ switchTab = function(tab, btn) {
       window._leado_dirty.stats = false;
       window._tabInit.stats = true;
     }
+    // Fixer count update karo jab bhi summary tab khule
+    if(typeof updateFixerCount === 'function') updateFixerCount();
   }
   if(tab === 'calc'){
     // Calculator is stateless — no init needed, just show tab
@@ -4203,7 +4209,8 @@ window.addEventListener('load', function(){
     var badge = document.getElementById('fixerCount');
     if(badge){
       badge.textContent = noDate.length;
-      badge.style.display = noDate.length > 0 ? 'inline' : 'none';
+      // div element hai — display block use karo, inline nahi
+      badge.style.display = '';
     }
   }
 
