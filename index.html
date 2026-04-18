@@ -835,6 +835,107 @@ body{font-family:'Inter','Noto Sans Devanagari',sans-serif;background:var(--bg-p
 .calc-bar-i{background:#ff4757;transition:flex .3s}
 .calc-bar-meta{display:flex;justify-content:space-between;font-size:10px;color:var(--text-muted);margin-top:4px}
 
+/* ===== AUTO CALL TIMER ===== */
+.call-timer-box{background:linear-gradient(135deg,rgba(0,201,167,.1),rgba(0,201,167,.05));border:1px solid rgba(0,201,167,.25);border-radius:12px;padding:12px 14px;margin-bottom:12px;display:flex;align-items:center;gap:12px}
+.call-timer-display{font-size:28px;font-weight:700;color:var(--accent-teal);font-family:'Inter',monospace;letter-spacing:2px;min-width:80px}
+.call-timer-display.running{animation:timerPulse 1s ease-in-out infinite}
+@keyframes timerPulse{0%,100%{opacity:1}50%{opacity:.7}}
+.call-timer-label{font-size:11px;color:var(--text-secondary);margin-top:2px}
+.call-timer-status{font-size:10px;font-weight:600;padding:3px 8px;border-radius:10px;margin-top:4px;display:inline-block}
+.cts-calling{background:rgba(255,71,87,.1);color:#ff4757}
+.cts-ended{background:rgba(0,201,167,.1);color:var(--accent-teal)}
+.call-auto-duration{font-size:12px;color:var(--accent-teal);font-weight:600;background:rgba(0,201,167,.08);border:1px solid rgba(0,201,167,.2);border-radius:8px;padding:6px 10px;margin-top:6px;display:none}
+
+/* ===== LIGHT MODE ===== */
+body.light-mode{
+  --bg-primary:#f0f4f8;
+  --bg-card:#ffffff;
+  --bg-card2:#f0f4f8;
+  --text-primary:#0f1923;
+  --text-secondary:#4a5568;
+  --text-muted:#8492a6;
+  --border:#d1dbe8;
+  --border-light:#cbd5e0;
+  --border-glow:rgba(79,124,255,0.15);
+  --accent-primary-dim:rgba(79,124,255,0.08);
+  --status-hot:#e53e3e;
+  --status-warm:#d97706;
+  --status-cold:#2b6cb0;
+  --status-converted:#276749;
+  --status-dead:#718096;
+  background-image:none;
+}
+body.light-mode .app-header{background:rgba(255,255,255,0.97);box-shadow:0 1px 0 rgba(0,0,0,0.1),0 4px 12px rgba(0,0,0,0.08)}
+body.light-mode .bottom-nav{background:rgba(255,255,255,0.97);border-top:1px solid var(--border)}
+body.light-mode .modal{background:#ffffff}
+body.light-mode .modal-overlay{background:rgba(0,0,0,0.4)}
+body.light-mode input,body.light-mode textarea,body.light-mode select{background:#ffffff;border-color:var(--border);color:var(--text-primary)}
+body.light-mode .lead-card{box-shadow:0 1px 4px rgba(0,0,0,0.08)}
+body.light-mode .lc-avatar{border-color:rgba(0,0,0,0.08)}
+body.light-mode .pin-btn{background:#f0f4f8;border-color:var(--border);color:var(--text-primary)}
+body.light-mode .splash-screen{background:#0f1923}
+body.light-mode .brochure-card{box-shadow:0 2px 8px rgba(0,0,0,0.1)}
+.theme-toggle-btn{width:38px;height:38px;border-radius:12px;border:1px solid var(--border);background:var(--bg-card2);color:var(--text-secondary);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .15s}
+.theme-toggle-btn:hover{border-color:var(--accent-primary);color:var(--accent-primary)}
+
+/* ===== PROJECT BROCHURE ===== */
+.brochure-grid{display:grid;grid-template-columns:1fr;gap:12px;padding-bottom:16px}
+.brochure-card{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;overflow:hidden;transition:transform .15s}
+.brochure-card:hover{transform:translateY(-1px)}
+.brochure-header{padding:14px 16px 10px;display:flex;align-items:center;gap:12px}
+.brochure-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.brochure-name{font-size:16px;font-weight:700;color:var(--text-primary);letter-spacing:-.3px}
+.brochure-tagline{font-size:11px;color:var(--text-muted);margin-top:2px}
+.brochure-body{padding:0 16px 14px}
+.brochure-detail-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border)}
+.brochure-detail-row:last-of-type{border-bottom:none}
+.brochure-dl{font-size:11px;color:var(--text-muted)}
+.brochure-dv{font-size:12px;font-weight:600;color:var(--text-primary)}
+.brochure-usp{margin:8px 0 12px;padding:8px 10px;background:var(--bg-card2);border-radius:8px;font-size:11px;color:var(--text-secondary);line-height:1.6}
+.brochure-share-btn{width:100%;padding:10px;border-radius:10px;border:none;background:var(--accent-primary);color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter','Noto Sans Devanagari',sans-serif;display:flex;align-items:center;justify-content:center;gap:6px;transition:background .15s}
+.brochure-share-btn:hover{background:var(--accent-primary-light)}
+.brochure-edit-row{display:flex;gap:8px;margin-bottom:8px}
+.brochure-edit-inp{flex:1;background:var(--bg-card2);border:1px solid var(--border-light);border-radius:8px;padding:7px 10px;color:var(--text-primary);font-size:12px;font-family:'Inter','Noto Sans Devanagari',sans-serif}
+.brochure-edit-inp:focus{outline:none;border-color:var(--accent-primary)}
+
+/* ===== VOICE INPUT ===== */
+.voice-btn{width:34px;height:34px;border-radius:8px;border:1px solid var(--border-light);background:var(--bg-card2);color:var(--text-secondary);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.voice-btn:hover{border-color:var(--accent-primary);color:var(--accent-primary)}
+.voice-btn.listening{background:rgba(255,71,87,.15);border-color:rgba(255,71,87,.5);color:#ff4757;animation:voicePulse 1s ease-in-out infinite}
+@keyframes voicePulse{0%,100%{box-shadow:0 0 0 0 rgba(255,71,87,.3)}50%{box-shadow:0 0 0 6px rgba(255,71,87,0)}}
+.voice-hint{font-size:10px;color:var(--accent-primary);margin-top:4px;display:none}
+.voice-hint.show{display:block}
+
+/* ===== BROCHURE MODAL ===== */
+.brochure-modal-body{padding:0 16px 20px}
+.brochure-proj-tabs{display:flex;gap:6px;overflow-x:auto;padding:12px 16px 0;scrollbar-width:none;border-bottom:1px solid var(--border)}
+.brochure-proj-tab{padding:7px 14px;border-radius:20px 20px 0 0;border:1px solid var(--border);border-bottom:none;background:var(--bg-card2);color:var(--text-muted);font-size:12px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s;font-family:'Inter',sans-serif}
+.brochure-proj-tab.active{background:var(--accent-primary-dim);color:var(--accent-primary);border-color:var(--accent-primary)}
+.brochure-proj-panel{display:none}.brochure-proj-panel.active{display:block}
+.bp-section{margin:14px 0}
+.bp-section-title{font-size:10px;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px}
+.bp-upload-row{display:flex;gap:8px;flex-wrap:wrap}
+.bp-upload-btn{flex:1;min-width:100px;padding:10px 8px;border-radius:10px;border:1.5px dashed var(--border-light);background:var(--bg-card2);color:var(--text-secondary);font-size:11px;font-weight:600;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;transition:all .15s;font-family:'Inter',sans-serif;position:relative;overflow:hidden}
+.bp-upload-btn:hover{border-color:var(--accent-primary);color:var(--accent-primary)}
+.bp-upload-btn input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.bp-upload-icon{font-size:20px}
+.bp-file-list{margin-top:8px;display:flex;flex-direction:column;gap:6px}
+.bp-file-item{display:flex;align-items:center;gap:8px;background:var(--bg-card2);border:1px solid var(--border);border-radius:8px;padding:8px 10px}
+.bp-file-thumb{width:36px;height:36px;border-radius:6px;object-fit:cover;flex-shrink:0;background:var(--bg-card);display:flex;align-items:center;justify-content:center;font-size:18px}
+.bp-file-name{flex:1;font-size:11px;font-weight:600;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bp-file-size{font-size:10px;color:var(--text-muted)}
+.bp-file-del{width:22px;height:22px;border-radius:50%;border:1px solid var(--border);background:var(--bg-card);color:var(--text-muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
+.bp-loc-row{display:flex;gap:6px;align-items:center}
+.bp-loc-inp{flex:1;background:var(--bg-card2);border:1px solid var(--border-light);border-radius:8px;padding:9px 10px;color:var(--text-primary);font-size:12px;font-family:'Inter',sans-serif}
+.bp-loc-inp:focus{outline:none;border-color:var(--accent-primary)}
+.bp-loc-btn{padding:9px 12px;border-radius:8px;border:1px solid var(--border-light);background:var(--bg-card2);color:var(--text-secondary);font-size:12px;cursor:pointer;white-space:nowrap}
+.bp-share-row{display:flex;gap:8px;margin-top:16px}
+.bp-share-btn{flex:1;padding:12px;border-radius:12px;border:none;background:#25d366;color:#fff;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;font-family:'Inter',sans-serif;transition:background .15s}
+.bp-share-btn:hover{background:#1ead55}
+.bp-share-txt-btn{padding:12px 14px;border-radius:12px;border:1px solid rgba(37,211,102,.3);background:rgba(37,211,102,.08);color:#25d366;font-size:13px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif}
+.bp-note{font-size:10px;color:var(--text-muted);background:var(--bg-card2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;line-height:1.6;margin-top:10px}
+.bp-count-badge{display:inline-flex;align-items:center;gap:4px;background:var(--accent-primary-dim);color:var(--accent-primary);padding:3px 8px;border-radius:10px;font-size:10px;font-weight:700;margin-left:6px}
+
 </style>
 
 <!-- OneSignal Push Notifications -->
@@ -991,6 +1092,12 @@ body{font-family:'Inter','Noto Sans Devanagari',sans-serif;background:var(--bg-p
     <button class="icon-btn" onclick="showOverdueAlert()" style="position:relative" title="Notifications">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
       <span id="notifBadge" style="display:none;position:absolute;top:-3px;right:-3px;background:var(--status-hot);color:white;font-size:9px;min-width:17px;height:17px;border-radius:50%;align-items:center;justify-content:center;font-weight:700;font-family:'Inter',sans-serif">0</span>
+    </button>
+    <button class="theme-toggle-btn" id="themeToggleBtn" onclick="toggleTheme()" title="Dark/Light Mode">
+      <svg id="themeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
+    <button class="icon-btn" onclick="openBrochureModal()" title="Project Brochure">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
     </button>
     <button class="icon-btn" onclick="showExportOptions()" title="Export">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
@@ -1154,6 +1261,8 @@ body{font-family:'Inter','Noto Sans Devanagari',sans-serif;background:var(--bg-p
             <option value="sqm">Sq M</option>
           </select>
         </div>
+
+
       </div>
       <div class="calc-row">
         <span class="calc-lbl">Market Rate</span>
@@ -1310,9 +1419,23 @@ body{font-family:'Inter','Noto Sans Devanagari',sans-serif;background:var(--bg-p
   <div class="modal">
     <div class="modal-handle"></div>
     <div class="modal-title" id="modalTitle">➕ नया Lead जोड़ें</div>
-    <div class="form-group"><label class="form-label">👤 नाम *</label><input class="form-input" id="fName" type="text" placeholder="Lead का नाम"></div>
+    <div class="form-group"><label class="form-label">👤 नाम *</label>
+  <div style="display:flex;gap:6px;align-items:center">
+    <input class="form-input" id="fName" type="text" placeholder="Lead का नाम" style="flex:1;margin:0">
+    <button type="button" class="voice-btn" id="voiceNameBtn" onclick="startVoice('fName','voiceNameBtn')" title="Voice se bolkar likhein">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+    </button>
+  </div>
+</div>
     <div class="form-row">
-      <div class="form-group"><label class="form-label">📱 मोबाइल *</label><input class="form-input" id="fPhone" type="tel" placeholder="9876543210"></div>
+      <div class="form-group"><label class="form-label">📱 मोबाइल *</label>
+  <div style="display:flex;gap:6px;align-items:center">
+    <input class="form-input" id="fPhone" type="tel" placeholder="9876543210" style="flex:1;margin:0">
+    <button type="button" class="voice-btn" id="voicePhoneBtn" onclick="startVoice('fPhone','voicePhoneBtn','number')" title="Voice se number bolein">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+    </button>
+  </div>
+</div>
       <div class="form-group"><label class="form-label">🏙️ एरिया</label><input class="form-input" id="fArea" type="text" placeholder="Ajmer Road..."></div>
     </div>
     <div class="form-group">
@@ -1354,7 +1477,11 @@ body{font-family:'Inter','Noto Sans Devanagari',sans-serif;background:var(--bg-p
         </select>
       </div>
     </div>
-    <div class="form-group"><label class="form-label">💬 Last बात क्या हुई</label><textarea class="form-textarea" id="fLastTalk" placeholder="पिछली बातचीत का सारांश..."></textarea></div>
+    <div class="form-group"><label class="form-label">💬 Last बात क्या हुई
+  <button type="button" class="voice-btn" id="voiceNotesBtn" onclick="startVoice('fLastTalk','voiceNotesBtn')" title="Voice se note karein" style="margin-left:8px;display:inline-flex;vertical-align:middle">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+  </button>
+</label><textarea class="form-textarea" id="fLastTalk" placeholder="पिछली बातचीत का सारांश..."></textarea></div>
     <div class="form-row">
       <div class="form-group"><label class="form-label">📅 Next Follow-Up</label><input class="form-input" id="fNextDate" type="date"></div>
       <div class="form-group"><label class="form-label">⏰ Time</label><input class="form-input" id="fNextTime" type="time"></div>
@@ -1531,6 +1658,17 @@ body{font-family:'Inter','Noto Sans Devanagari',sans-serif;background:var(--bg-p
       <div class="info-box-sub" id="callPhone">—</div>
       <div class="info-box-sub" id="callProject" style="margin-top:2px">—</div>
     </div>
+    <!-- AUTO CALL TIMER -->
+    <div class="call-timer-box">
+      <div>
+        <div class="call-timer-display" id="callTimerDisplay">0:00</div>
+        <div class="call-timer-label">Call Duration</div>
+      </div>
+      <div style="flex:1">
+        <div class="call-timer-status cts-calling" id="callTimerStatus">📞 Calling...</div>
+        <div class="call-auto-duration" id="callAutoDuration">⚡ Auto-detected: <span id="callAutoDurationText">—</span></div>
+      </div>
+    </div>
     <div class="form-group">
       <label class="form-label">📞 Baat Hui?</label>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px">
@@ -1541,13 +1679,14 @@ body{font-family:'Inter','Noto Sans Devanagari',sans-serif;background:var(--bg-p
       </div>
     </div>
     <div class="form-group" id="callDurationGroup">
-      <label class="form-label">⏱️ Kitni Der Baat Hui?</label>
+      <label class="form-label">⏱️ Duration <span style="font-size:10px;color:var(--accent-teal);font-weight:600">(Auto detect ho raha hai)</span></label>
       <div style="display:flex;gap:8px;margin-top:4px;flex-wrap:wrap">
         <button class="call-duration-btn active" onclick="selectDuration('< 1 min')">1 min se kam</button>
         <button class="call-duration-btn" onclick="selectDuration('1-5 min')">1-5 min</button>
         <button class="call-duration-btn" onclick="selectDuration('5-10 min')">5-10 min</button>
         <button class="call-duration-btn" onclick="selectDuration('10+ min')">10+ min</button>
       </div>
+      <div style="font-size:10px;color:var(--text-muted);margin-top:4px">↑ Auto set ho gaya — zaroorat nahi badlne ki. Phir bhi change kar sakte hain.</div>
     </div>
     <div class="form-group">
       <label class="form-label">💬 Call Notes</label>
@@ -2554,9 +2693,98 @@ function deleteLead(){
 }
 
 let callingId=null,selectedCallResult='connected',selectedDuration='< 1 min';
+
+// ===== AUTO CALL TIMER =====
+var _callTimerInterval = null;
+var _callStartTime = null;
+var _callEndTime = null;
+
+function startCallTimer(){
+  _callStartTime = Date.now();
+  _callEndTime = null;
+  var display = document.getElementById('callTimerDisplay');
+  var status  = document.getElementById('callTimerStatus');
+  if(display) { display.textContent = '0:00'; display.classList.add('running'); }
+  if(status)  { status.textContent = '📞 Calling...'; status.className = 'call-timer-status cts-calling'; }
+  clearInterval(_callTimerInterval);
+  _callTimerInterval = setInterval(function(){
+    if(!_callStartTime) return;
+    var elapsed = Math.floor((Date.now() - _callStartTime) / 1000);
+    var mins = Math.floor(elapsed / 60);
+    var secs = elapsed % 60;
+    if(display) display.textContent = mins + ':' + (secs < 10 ? '0' : '') + secs;
+  }, 1000);
+}
+
+function stopCallTimer(){
+  _callEndTime = Date.now();
+  clearInterval(_callTimerInterval);
+  var display = document.getElementById('callTimerDisplay');
+  var status  = document.getElementById('callTimerStatus');
+  var autoDiv = document.getElementById('callAutoDuration');
+  var autoTxt = document.getElementById('callAutoDurationText');
+  if(display) display.classList.remove('running');
+
+  if(!_callStartTime) return;
+  var elapsed = Math.floor((_callEndTime - _callStartTime) / 1000);
+  var mins = Math.floor(elapsed / 60);
+  var secs = elapsed % 60;
+  var displayStr = mins + ':' + (secs < 10 ? '0' : '') + secs;
+
+  // Auto duration category
+  var autoCat;
+  if(elapsed < 60)        autoCat = '< 1 min';
+  else if(elapsed < 300)  autoCat = '1-5 min';
+  else if(elapsed < 600)  autoCat = '5-10 min';
+  else                    autoCat = '10+ min';
+
+  selectedDuration = autoCat;
+
+  // Update UI
+  if(status) { status.textContent = '✅ ' + displayStr + ' baat hui'; status.className = 'call-timer-status cts-ended'; }
+  if(autoDiv) { autoDiv.style.display = 'block'; }
+  if(autoTxt) { autoTxt.textContent = autoCat + ' (' + displayStr + ')'; }
+
+  // Duration buttons auto select
+  document.querySelectorAll('.call-duration-btn').forEach(function(b){
+    var isActive = b.getAttribute('onclick') === "selectDuration('" + autoCat + "')";
+    b.classList.toggle('active', isActive);
+  });
+
+  // Agar timer 0 se kam (nahi utha) → automatically "Nahi Utha" select karo
+  if(elapsed < 5){
+    selectedCallResult = 'not_answered';
+    document.querySelectorAll('.call-result-btn').forEach(function(b){ b.classList.remove('active'); });
+    var naBtn = document.getElementById('crNotAnswered');
+    if(naBtn) naBtn.classList.add('active');
+    document.getElementById('callDurationGroup').style.display = 'none';
+    if(status) { status.textContent = '❌ Nahi utha ('+displayStr+')'; status.className = 'call-timer-status cts-calling'; }
+  }
+}
+
+// Page visibility change — jab user call se wapas aata hai
+document.addEventListener('visibilitychange', function(){
+  if(document.visibilityState === 'visible' && _callStartTime && !_callEndTime){
+    // User wapas aaya — call khatam samjho
+    setTimeout(function(){
+      if(_callStartTime && !_callEndTime && document.getElementById('callModal').classList.contains('active')){
+        stopCallTimer();
+      }
+    }, 500);
+  }
+});
+
 function callLead(id,phone){
   callingId=id;const l=leads.find(x=>x.id===id);if(!l)return;
+
+  // Timer reset
+  clearInterval(_callTimerInterval);
+  _callStartTime = null;
+  _callEndTime   = null;
+
   window.location.href=`tel:${phone}`;
+
+  // Modal after 2.5 sec — call dialing time
   setTimeout(()=>{
     document.getElementById('callName').textContent=l.name;
     document.getElementById('callPhone').textContent='📱 '+l.phone;
@@ -2571,7 +2799,16 @@ function callLead(id,phone){
     document.getElementById('callFollowupFields').style.display='none';
     document.getElementById('callFollowupHint').style.display='block';
     document.getElementById('callFollowupDate').value='';document.getElementById('callFollowupTime').value='';document.getElementById('callFollowupNote').value='';
+    // Auto duration box reset
+    var autoDiv = document.getElementById('callAutoDuration');
+    if(autoDiv) autoDiv.style.display = 'none';
+    var disp = document.getElementById('callTimerDisplay');
+    if(disp){ disp.textContent='0:00'; disp.classList.remove('running'); }
+    var stat = document.getElementById('callTimerStatus');
+    if(stat){ stat.textContent='📞 Calling...'; stat.className='call-timer-status cts-calling'; }
     document.getElementById('callModal').classList.add('active');
+    // ✅ Timer START — modal khulte hi
+    startCallTimer();
   },2500);
 }
 function selectCallResult(result){
@@ -2593,7 +2830,11 @@ function toggleCallFollowup(){
 }
 function saveCallRecord(){
   if(!callingId)return;const idx=leads.findIndex(l=>l.id===callingId);if(idx===-1)return;
-  const callRecord={date:new Date().toISOString(),result:selectedCallResult,duration:selectedCallResult==='connected'?selectedDuration:null,notes:document.getElementById('callNotes').value.trim()};
+  // ✅ Auto timer se actual duration
+  var actualSeconds = (_callStartTime && _callEndTime) ? Math.floor((_callEndTime - _callStartTime)/1000) : 0;
+  var actualDisplay = actualSeconds > 0 ? (Math.floor(actualSeconds/60)+':'+(actualSeconds%60<10?'0':'')+actualSeconds%60) : null;
+  var finalDuration = selectedCallResult==='connected' ? (actualDisplay ? selectedDuration+' ('+actualDisplay+')' : selectedDuration) : null;
+  const callRecord={date:new Date().toISOString(),result:selectedCallResult,duration:finalDuration,durationSecs:actualSeconds,notes:document.getElementById('callNotes').value.trim()};
   if(!leads[idx].callHistory)leads[idx].callHistory=[];
   leads[idx].callHistory.push(callRecord);leads[idx].lastUpdated=new Date().toISOString();
   const newStatus=document.getElementById('callStatusUpdate').value;if(newStatus)leads[idx].status=newStatus;
@@ -2613,7 +2854,7 @@ function saveCallRecord(){
   if(addedFollowup)msg+=` | 📅 Follow-up set!`;
   showToast(msg,'success');
 }
-function closeCallModal(){document.getElementById('callModal').classList.remove('active');callingId=null;}
+function closeCallModal(){clearInterval(_callTimerInterval);_callStartTime=null;_callEndTime=null;document.getElementById('callModal').classList.remove('active');callingId=null;}
 function closeCallHistoryModal(){document.getElementById('callHistoryModal').classList.remove('active');}
 
 // ===== LEAD HISTORY =====
@@ -2921,38 +3162,26 @@ window.addEventListener('load',()=>{setTimeout(()=>{initGoogleAuth();initDriveAu
 
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){
-
-    // 1. firebase-messaging-sw.js — FCM background notifications (MOST IMPORTANT!)
-    navigator.serviceWorker.register('/firebase-messaging-sw.js', {scope: '/'})
+    // ✅ SIRF EK SW — OneSignalSDKWorker.js
+    // Isme already SCHEDULE_NOTIFICATION handler hai
+    // Multiple SW same scope pe conflict karte hain — isliye sirf ek
+    navigator.serviceWorker.register('/OneSignalSDKWorker.js', {scope: '/'})
       .then(function(reg){
-        console.log('[FCM SW] firebase-messaging-sw.js registered!');
-        // FCM token ko is SW se link karo
+        console.log('[SW] Registered! Scope:', reg.scope);
         window._swRegistration = reg;
-      })
-      .catch(function(err){ console.log('[FCM SW] Error:', err); });
-
-    // 2. Custom sw.js — caching + push fallback
-    navigator.serviceWorker.register('/sw.js', {scope: '/'})
-      .then(function(reg){
-        console.log('[SW] Custom sw.js registered:', reg.scope);
         return navigator.serviceWorker.ready;
       })
       .then(function(){
-        console.log('[SW] Ready! Scheduling notifications...');
+        console.log('[SW] Ready — scheduling notifications...');
         setTimeout(scheduleAllNotifications, 1000);
       })
-      .catch(function(err){ console.log('[SW] Error:', err); });
-
-    // 3. OneSignal SW
-    navigator.serviceWorker.register('/OneSignalSDKWorker.js', {scope: '/'})
-      .then(function(reg){ console.log('[OneSignal SW] Registered!'); })
-      .catch(function(err){ console.log('[OneSignal SW] Error:', err); });
+      .catch(function(err){ console.log('[SW] Registration error:', err); });
   });
 
-  // SW se message receive karo
+  // SW message — notification tap se lead open
   navigator.serviceWorker.addEventListener('message', function(e){
-    if(e.data && e.data.type === 'OPEN_LEAD'){
-      editLead(e.data.leadId);
+    if(e.data && e.data.type === 'OPEN_LEAD' && e.data.leadId){
+      try{ editLead(e.data.leadId); }catch(err){}
     }
   });
 }
@@ -3779,22 +4008,28 @@ window.addEventListener('load', function(){
     const isAndroid = /Android/i.test(navigator.userAgent);
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
     
-    if((isAndroid || isStandalone) && 'Notification' in window){
+    if('Notification' in window){
       if(Notification.permission === 'default'){
-        // Seedha native permission dialog dikhao
+        // PWA + Browser dono mein permission maango
         Notification.requestPermission().then(function(permission){
           if(permission === 'granted'){
-            showToast('🔔 Notifications ON! Follow-up reminders milenge!', 'success');
+            showToast('🔔 Notifications ON!', 'success');
             scheduleAllNotifications();
-            // OneSignal bhi subscribe karo
-            if(typeof OneSignal !== 'undefined'){
-              OneSignal.User.PushSubscription.optIn();
-            }
+            if(window.OneSignal) OneSignal.User.PushSubscription.optIn();
           }
         });
+      } else if(Notification.permission === 'granted'){
+        // Already allowed — notifications schedule karo
+        scheduleAllNotifications();
+        if(window.OneSignal) OneSignal.User.PushSubscription.optIn();
+      } else if(Notification.permission === 'denied'){
+        // Blocked hai — user ko guide karo
+        if(isStandalone){
+          console.log('[PWA] Notifications blocked — user ko manually allow karna hoga');
+        }
       }
     }
-  }, 3000); // 3 sec baad — splash screen ke baad
+  }, 3000);
 });
 
 
@@ -3890,7 +4125,324 @@ window.addEventListener('load', function(){
 })();
 // ===== END PLOT CALCULATOR =====
 
+
+// ===== LIGHT MODE =====
+(function(){
+  function applyTheme(mode){
+    if(mode === 'light'){
+      document.body.classList.add('light-mode');
+      const icon = document.getElementById('themeIcon');
+      if(icon) icon.innerHTML = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+    } else {
+      document.body.classList.remove('light-mode');
+      const icon = document.getElementById('themeIcon');
+      if(icon) icon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+    }
+  }
+  // Load saved theme
+  var saved = localStorage.getItem('leado_theme') || 'dark';
+  applyTheme(saved);
+
+  window.toggleTheme = function(){
+    var current = document.body.classList.contains('light-mode') ? 'light' : 'dark';
+    var next = current === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('leado_theme', next);
+    applyTheme(next);
+    showToast(next === 'light' ? '☀️ Light Mode ON' : '🌙 Dark Mode ON');
+  };
+})();
+// ===== END LIGHT MODE =====
+
+
+// ===== VOICE INPUT =====
+(function(){
+  var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  var activeRecog = null;
+
+  window.startVoice = function(targetId, btnId, mode){
+    if(!SpeechRecognition){
+      showToast('⚠️ Aapka browser voice support nahi karta');
+      return;
+    }
+    var btn = document.getElementById(btnId);
+    var input = document.getElementById(targetId);
+    if(!btn || !input) return;
+
+    // Agar already sun raha hai toh band karo
+    if(btn.classList.contains('listening')){
+      if(activeRecog){ activeRecog.stop(); activeRecog = null; }
+      btn.classList.remove('listening');
+      return;
+    }
+
+    var recog = new SpeechRecognition();
+    recog.lang = 'hi-IN';
+    recog.continuous = false;
+    recog.interimResults = false;
+    activeRecog = recog;
+
+    btn.classList.add('listening');
+    showToast('🎤 Bol rahe hain... sunna shuru');
+
+    recog.onresult = function(e){
+      var transcript = e.results[0][0].transcript;
+      if(mode === 'number'){
+        // Numbers only — Hindi mein bole toh bhi convert
+        transcript = transcript.replace(/[^0-9]/g,'');
+      }
+      if(input.tagName === 'TEXTAREA'){
+        input.value = input.value ? input.value + ' ' + transcript : transcript;
+      } else {
+        input.value = transcript;
+      }
+      // Trigger input event for reactivity
+      input.dispatchEvent(new Event('input'));
+      showToast('✅ Suna: ' + transcript.slice(0,30));
+    };
+
+    recog.onerror = function(e){
+      showToast('⚠️ Voice error: ' + (e.error === 'no-speech' ? 'Kuch suna nahi' : e.error));
+      btn.classList.remove('listening');
+      activeRecog = null;
+    };
+
+    recog.onend = function(){
+      btn.classList.remove('listening');
+      activeRecog = null;
+    };
+
+    recog.start();
+  };
+})();
+
+// ===== PROJECT BROCHURE SYSTEM =====
+(function(){
+  var PROJS = [
+    {id:'imperial-estate', name:'Imperial Estate', icon:'IE', bg:'#1e3a8a', price:'25k-35k/Gaj', desc:'Army Area — Premium Plots'},
+    {id:'imperial-galaxy', name:'Imperial Galaxy', icon:'IG', bg:'#4c1d95', price:'20k-28k/Gaj', desc:'Modern Smart Township'},
+    {id:'solitair-home',   name:'Solitair Home',   icon:'SH', bg:'#064e3b', price:'15k-22k/Gaj', desc:'Luxury Affordable'},
+    {id:'dream-town',      name:'Dream Town',      icon:'DT', bg:'#78350f', price:'12k-18k/Gaj', desc:'Apna Ghar Sapna Poora'},
+    {id:'govind-vihar',    name:'Govind Vihar',    icon:'GV', bg:'#14532d', price:'10k-16k/Gaj', desc:'Green Living'}
+  ];
+
+  function ld(pid){ try{ return JSON.parse(localStorage.getItem('bp_'+pid)||'{"files":[],"loc":""}'); }catch(e){ return {files:[],loc:''}; } }
+  function sd(pid,d){ localStorage.setItem('bp_'+pid, JSON.stringify(d)); }
+  function fs(b){ return b<1048576 ? Math.round(b/1024)+' KB' : (b/1048576).toFixed(1)+' MB'; }
+
+  // Open modal
+  window.openBrochureModal = function(){
+    var modal = document.getElementById('brochureModal');
+    if(!modal) return;
+    modal.classList.add('active');
+    buildTabs();
+    bpSwitch(PROJS[0].id);
+  };
+
+  var ov = document.getElementById('brochureModal');
+  if(ov) ov.addEventListener('click', function(e){ if(e.target===this) this.classList.remove('active'); });
+
+  function buildTabs(){
+    var el = document.getElementById('brochureProjTabs');
+    if(!el) return;
+    var h = '';
+    for(var i=0;i<PROJS.length;i++){
+      var p = PROJS[i];
+      h += '<button class="brochure-proj-tab" id="bptab-'+p.id+'" data-id="'+p.id+'" onclick="bpSwitch(this.dataset.id)">'+p.name+'</button>';
+    }
+    el.innerHTML = h;
+  }
+
+  window.bpSwitch = function(pid){
+    for(var i=0;i<PROJS.length;i++){
+      var t = document.getElementById('bptab-'+PROJS[i].id);
+      if(t) t.className = 'brochure-proj-tab'+(PROJS[i].id===pid?' active':'');
+    }
+    buildPanel(pid);
+  };
+
+  function buildPanel(pid){
+    var p = null;
+    for(var i=0;i<PROJS.length;i++){ if(PROJS[i].id===pid){ p=PROJS[i]; break; } }
+    if(!p) return;
+    var el = document.getElementById('brochurePanels');
+    if(!el) return;
+    var d = ld(pid);
+
+    // Build file list HTML
+    var fhtml = '';
+    if(d.files.length === 0){
+      fhtml = '<div style="font-size:11px;color:var(--text-muted);padding:6px 0">Abhi koi file nahi — neeche se add karein</div>';
+    } else {
+      for(var j=0;j<d.files.length;j++){
+        var f = d.files[j];
+        var ico = f.ftype==='image' ? '<img src="'+f.data+'" style="width:36px;height:36px;border-radius:6px;object-fit:cover">' : '<div class="bp-file-thumb">'+(f.ftype==='pdf'?'📄':'🎬')+'</div>';
+        fhtml += '<div class="bp-file-item">'+ico+'<div style="flex:1;min-width:0"><div class="bp-file-name">'+f.name+'</div><div class="bp-file-size">'+f.sz+'</div></div><button class="bp-file-del" data-pid="'+pid+'" data-idx="'+j+'" onclick="bpDel(this.dataset.pid,this.dataset.idx)">✕</button></div>';
+      }
+    }
+
+    var cntBadge = d.files.length ? '<span class="bp-count-badge">'+d.files.length+'</span>' : '';
+    var locVal = (d.loc||'').replace(/"/g,'&quot;');
+
+    // Build full panel using createElement-free approach
+    el.innerHTML = [
+      '<div style="padding-top:4px">',
+
+      // Project header
+      '<div style="display:flex;align-items:center;gap:10px;padding:12px 0 10px;border-bottom:1px solid var(--border)">',
+        '<div style="width:40px;height:40px;border-radius:10px;background:'+p.bg+';display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:700">'+p.icon+'</div>',
+        '<div>',
+          '<div style="font-size:15px;font-weight:700;color:var(--text-primary)">'+p.name+'</div>',
+          '<div style="font-size:11px;color:var(--text-muted)">'+p.desc+' &bull; '+p.price+'</div>',
+        '</div>',
+      '</div>',
+
+      // Files
+      '<div class="bp-section">',
+        '<div class="bp-section-title">📎 Files '+cntBadge+'</div>',
+        '<div id="bpFL">'+fhtml+'</div>',
+        '<div class="bp-upload-row" style="margin-top:10px">',
+          '<label class="bp-upload-btn">',
+            '<input type="file" accept="image/*" multiple style="display:none" data-pid="'+pid+'" data-ft="image" onchange="bpAdd(this)">',
+            '<div class="bp-upload-icon">🖼️</div><span>Photos</span>',
+          '</label>',
+          '<label class="bp-upload-btn">',
+            '<input type="file" accept="application/pdf,.pdf" style="display:none" data-pid="'+pid+'" data-ft="pdf" onchange="bpAdd(this)">',
+            '<div class="bp-upload-icon">📄</div><span>PDF</span>',
+          '</label>',
+          '<label class="bp-upload-btn">',
+            '<input type="file" accept="video/*" style="display:none" data-pid="'+pid+'" data-ft="video" onchange="bpAdd(this)">',
+            '<div class="bp-upload-icon">🎬</div><span>Video</span>',
+          '</label>',
+        '</div>',
+      '</div>',
+
+      // Location
+      '<div class="bp-section">',
+        '<div class="bp-section-title">📍 Google Maps Location</div>',
+        '<div class="bp-loc-row">',
+          '<input class="bp-loc-inp" id="bpLocInp" placeholder="Google Maps link paste karein..." value="'+locVal+'" data-pid="'+pid+'" oninput="bpSaveLoc(this)">',
+          '<button class="bp-loc-btn" data-pid="'+pid+'" onclick="bpGPS(this.dataset.pid)">📍 Current</button>',
+        '</div>',
+      '</div>',
+
+      // Share buttons
+      '<div class="bp-share-row">',
+        '<button class="bp-share-btn" data-pid="'+pid+'" onclick="bpShare(this.dataset.pid)">',
+          '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+          'WhatsApp Share (Files + Text)',
+        '</button>',
+        '<button class="bp-share-txt-btn" data-pid="'+pid+'" onclick="bpTxt(this.dataset.pid)">Text Only</button>',
+      '</div>',
+      '<div class="bp-note">ℹ️ Files share karte waqt Android Share Sheet khulega — WhatsApp chunein — message + files dono ready milenge. Sirf 1 extra tap!</div>',
+
+      '</div>'
+    ].join('');
+  }
+
+  // Add files
+  window.bpAdd = function(input){
+    var pid = input.dataset.pid, ft = input.dataset.ft;
+    var files = Array.from(input.files); if(!files.length) return;
+    var d = ld(pid), pending = files.length;
+    for(var i=0;i<files.length;i++){
+      (function(file){
+        if(file.size > 25*1024*1024){ showToast('⚠️ '+file.name+' 25MB limit'); pending--; if(!pending){ sd(pid,d); buildPanel(pid); } return; }
+        var r = new FileReader();
+        r.onload = function(e){
+          d.files.push({name:file.name, sz:fs(file.size), ftype:ft, data:e.target.result, mime:file.type});
+          pending--; if(!pending){ sd(pid,d); buildPanel(pid); showToast('✅ '+files.length+' file add hui'); }
+        };
+        r.readAsDataURL(file);
+      })(files[i]);
+    }
+    input.value = '';
+  };
+
+  // Delete file
+  window.bpDel = function(pid, idx){
+    var d = ld(pid); d.files.splice(parseInt(idx),1); sd(pid,d); buildPanel(pid);
+  };
+
+  // Save location
+  window.bpSaveLoc = function(inp){
+    var pid = inp.dataset.pid, d = ld(pid); d.loc = inp.value; sd(pid,d);
+  };
+
+  // GPS location
+  window.bpGPS = function(pid){
+    if(!navigator.geolocation){ showToast('⚠️ Location support nahi'); return; }
+    showToast('📍 Location detect ho raha hai...');
+    navigator.geolocation.getCurrentPosition(function(pos){
+      var url = 'https://maps.google.com/?q='+pos.coords.latitude+','+pos.coords.longitude;
+      var inp = document.getElementById('bpLocInp');
+      if(inp){ inp.value = url; inp.dataset.pid = pid; bpSaveLoc(inp); }
+      showToast('✅ Location save ho gayi!');
+    }, function(){ showToast('⚠️ Location nahi mili'); });
+  };
+
+  // Share with files via Web Share API
+  window.bpShare = function(pid){
+    var p = null; for(var i=0;i<PROJS.length;i++){ if(PROJS[i].id===pid){ p=PROJS[i]; break; } }
+    var d = ld(pid);
+    var nl = '\n';
+    var text = p.name+nl+p.desc+nl+'Rate: '+p.price+nl+(d.loc?'Location: '+d.loc+nl:'')+'Call karein aaj!';
+
+    // Convert base64 to File objects (skip video - too large)
+    var fileObjs = [];
+    try{
+      var toShare = d.files.filter(function(f){ return f.ftype !== 'video'; }).slice(0,5);
+      for(var i=0;i<toShare.length;i++){
+        var f = toShare[i];
+        var arr = f.data.split(','), mime = arr[0].match(/:(.*?);/)[1];
+        var bstr = atob(arr[1]), n = bstr.length, u8 = new Uint8Array(n);
+        while(n--) u8[n] = bstr.charCodeAt(n);
+        fileObjs.push(new File([u8], f.name, {type: mime}));
+      }
+    }catch(e){ fileObjs = []; }
+
+    if(fileObjs.length > 0 && navigator.canShare && navigator.canShare({files:fileObjs, text:text})){
+      navigator.share({files:fileObjs, text:text})
+        .then(function(){ showToast('✅ Share ho gaya!'); })
+        .catch(function(e){ if(e.name !== 'AbortError') bpTxt(pid); });
+    } else if(navigator.share){
+      navigator.share({text:text})
+        .then(function(){ if(fileObjs.length) showToast('📄 Text share hua — files manually attach karein'); })
+        .catch(function(e){ if(e.name !== 'AbortError') bpTxt(pid); });
+    } else {
+      bpTxt(pid);
+    }
+  };
+
+  // Text only WA
+  window.bpTxt = function(pid){
+    var p = null; for(var i=0;i<PROJS.length;i++){ if(PROJS[i].id===pid){ p=PROJS[i]; break; } }
+    var d = ld(pid);
+    var msg = '*'+p.name+'*\n'+p.desc+'\nRate: '+p.price+(d.loc?'\nLocation: '+d.loc:'')+'\n\nCall karein!';
+    openWhatsApp('whatsapp://send?text='+encodeURIComponent(msg));
+  };
+})();
+// ===== END BROCHURE SYSTEM =====
+
+// ===== END VOICE INPUT =====
+
 </script>
+
+<!-- ===== BROCHURE MODAL ===== -->
+<div class="modal-overlay" id="brochureModal">
+  <div class="modal" style="max-height:92vh;overflow-y:auto;padding-bottom:0">
+    <div style="padding:16px 16px 0">
+      <div class="modal-handle"></div>
+      <div class="modal-title" style="display:flex;align-items:center;gap:8px">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Project Brochure
+      </div>
+    </div>
+    <!-- Project Tabs -->
+    <div class="brochure-proj-tabs" id="brochureProjTabs"></div>
+    <!-- Panels -->
+    <div class="brochure-modal-body" id="brochurePanels"></div>
+  </div>
+</div>
 
 </body>
 </html>
