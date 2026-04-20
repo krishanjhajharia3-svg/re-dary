@@ -408,6 +408,7 @@ body{font-family:'Inter','Noto Sans Devanagari',sans-serif;background:var(--bg-p
 
 
 /* ===== NOTIFICATION POPUP ===== */
+.notif-close{display:inline-block;margin-top:10px;padding:8px 16px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.3);border-radius:8px;color:#ffffff;font-size:12px;font-weight:600;cursor:pointer;text-align:center;width:100%}
 .notif-popup{position:fixed;top:70px;left:12px;right:12px;background:linear-gradient(135deg,#1a2235,#111827);border:1px solid rgba(212,168,67,.3);border-radius:16px;padding:14px 16px;z-index:500;box-shadow:0 8px 32px rgba(0,0,0,.5);display:none;animation:slideDown .3s ease}
 .notif-popup.show{display:block}
 @keyframes slideDown{from{transform:translateY(-20px);opacity:0}to{transform:translateY(0);opacity:1}}
@@ -934,6 +935,26 @@ body.light-mode .fab{box-shadow:0 4px 14px rgba(79,124,255,0.3)!important}
 .fixer-empty{text-align:center;padding:30px 0;color:var(--text-muted);font-size:14px}
 
 
+/* Summary light mode text fix */
+body.light-mode .summary-value{color:#1a1a2e!important}
+body.light-mode .summary-label{color:#546e7a!important}
+body.light-mode .sv-hot{color:var(--status-hot)!important}
+body.light-mode .sv-warm{color:var(--status-warm)!important}
+body.light-mode .sv-cold{color:var(--status-cold)!important}
+body.light-mode .sv-converted{color:var(--status-converted)!important}
+body.light-mode .sv-visit{color:var(--accent-purple)!important}
+body.light-mode .followup-day{color:#1a1a2e!important}
+body.light-mode .followup-month{color:#546e7a!important}
+body.light-mode .followup-name{color:#1a1a2e!important}
+body.light-mode .followup-note{color:#546e7a!important}
+body.light-mode .followup-date{color:#546e7a!important}
+body.light-mode .section-title{color:#546e7a!important}
+body.light-mode .stat-num{color:#1a1a2e!important}
+body.light-mode .stat-label{color:#546e7a!important}
+body.light-mode .home-today-item{color:#1a1a2e!important}
+body.light-mode .today-label{color:#546e7a!important}
+body.light-mode .today-count{color:#1a1a2e!important}
+
 </style>
 
 <!-- OneSignal Push Notifications -->
@@ -1102,10 +1123,10 @@ body.light-mode .fab{box-shadow:0 4px 14px rgba(79,124,255,0.3)!important}
 
 <div class="stats-bar">
   <div class="stat-item" onclick="switchTabByName('leads')"><div class="stat-num" id="statTotal">0</div><div class="stat-label">कुल</div></div>
-  <div class="stat-item" onclick="switchTabByName('leads');setFilterByName('hot')"><div class="stat-num" id="statHot" style="color:var(--accent-red)">0</div><div class="stat-label">Hot🔥</div></div>
-  <div class="stat-item" onclick="switchTabByName('leads');setFilterByName('warm')"><div class="stat-num" id="statWarm" style="color:var(--accent-gold)">0</div><div class="stat-label">Warm⭐</div></div>
-  <div class="stat-item" onclick="switchTabByName('leads');setFilterByName('converted')"><div class="stat-num" id="statConverted" style="color:var(--accent-teal)">0</div><div class="stat-label">Close✅</div></div>
-  <div class="stat-item" onclick="switchTabByName('visits')"><div class="stat-num" id="statVisit" style="color:var(--accent-purple)">0</div><div class="stat-label">Visit🏠</div></div>
+  <div class="stat-item" onclick="switchTabByName('leads');setFilterByName('hot')"><div class="stat-num" id="statHot" style="color:var(--accent-red)">0</div><div class="stat-label">🔥 Ready to Buy</div></div>
+  <div class="stat-item" onclick="switchTabByName('leads');setFilterByName('warm')"><div class="stat-num" id="statWarm" style="color:var(--accent-gold)">0</div><div class="stat-label">⭐ Interested</div></div>
+  <div class="stat-item" onclick="switchTabByName('leads');setFilterByName('converted')"><div class="stat-num" id="statConverted" style="color:var(--accent-teal)">0</div><div class="stat-label">✅ Converted</div></div>
+  <div class="stat-item" onclick="switchTabByName('visits')"><div class="stat-num" id="statVisit" style="color:var(--accent-purple)">0</div><div class="stat-label">🏠 Visit</div></div>
 </div>
 
 <div class="tab-nav">
@@ -1492,7 +1513,7 @@ body.light-mode .fab{box-shadow:0 4px 14px rgba(79,124,255,0.3)!important}
     <div class="form-group"><label class="form-label">📝 Reminder Note</label><input class="form-input" id="fNextNote" type="text" placeholder="Call karke plot details share karein..."></div>
     <!-- STICKY SAVE BUTTON -->
     <div style="position:sticky;bottom:0;background:var(--bg-card);padding:10px 0 8px;margin-top:8px;border-top:1px solid var(--border)">
-      <button class="btn-primary" onclick="saveLead()" style="margin-bottom:8px">💾 Save & Calendar में जोड़ें</button>
+      <button class="btn-primary" onclick="saveLead()" style="margin-bottom:8px">💾 Lead Save करें</button>
       <button class="btn-secondary" onclick="closeModal()">रद्द करें</button>
       <button class="btn-danger" id="deleteLeadBtn" style="display:none" onclick="deleteLead()">🗑️ Lead Delete करें</button>
     </div>
@@ -2493,7 +2514,7 @@ async function uploadPhotosToDrive(leadId,leadName){
 
 function openVisitModal(id){
   const l=leads.find(x=>x.id===id);if(!l)return;
-  visitingId=id;
+  visitingId=id;var _vm=document.getElementById('visitModal');if(_vm)_vm.dataset.leadId=id;
   // Button state reset - pichli baar disabled tha toh bhi theek ho
   window._visitSaving=false;
   const saveBtn=document.getElementById('visitSaveBtn');
@@ -2516,7 +2537,12 @@ async function saveVisit(){
   // Guard: already saving? ruko
   if(window._visitSaving){return;}
   // visitingId check
-  if(!visitingId){showToast('⚠️ Visit open karein pehle');return;}
+  if(!visitingId){
+    // Try to recover from modal
+    var modal = document.getElementById('visitModal');
+    if(modal && modal.dataset && modal.dataset.leadId) visitingId = modal.dataset.leadId;
+    if(!visitingId){showToast('⚠️ Visit open karein pehle');return;}
+  }
   const currentId=visitingId; // save karo - async mein change ho sakta hai
   const idx=leads.findIndex(l=>l.id===currentId);
   if(idx===-1){showToast('⚠️ Lead nahi mila!');return;}
@@ -2596,8 +2622,27 @@ function openContactModal(id){
       if(fbUser.photoURL){document.getElementById('googleAvatar').innerHTML='<img src="'+fbUser.photoURL+'" style="width:32px;height:32px;border-radius:50%;object-fit:cover">';}
       document.getElementById('googleNotLoggedIn').style.display='none';
       document.getElementById('googleLoggedIn').style.display='block';
-      if(!tokenClient){initGoogleAuth();}
-      if(!googleAccessToken&&tokenClient){try{tokenClient.requestAccessToken({prompt:''});}catch(e){console.log('token silent req:',e);}}
+      // Cached token restore karo - drive token bhi contacts ke liye kaam karta hai
+      if(!googleAccessToken){
+        var cached = sessionStorage.getItem('drive_token');
+        if(cached){ googleAccessToken = cached; driveAccessToken = cached; }
+      }
+      // Token nahi hai? Silent request karo
+      if(!googleAccessToken){
+        if(!driveTokenClient){initDriveAuth();}
+        if(driveTokenClient){
+          try{
+            var saveBtn=document.getElementById('saveToGoogleBtn');
+            if(saveBtn){saveBtn.disabled=true;saveBtn.textContent='⏳ Token le raha hai...';}
+            driveTokenClient.requestAccessToken({prompt:'',callback:function(){
+              if(saveBtn){saveBtn.disabled=false;saveBtn.innerHTML='🔵 Google Contacts में Save करें';}
+            }});
+          }catch(e){console.log('token req:',e);}
+        } else if(!tokenClient){
+          initGoogleAuth();
+          if(tokenClient){try{tokenClient.requestAccessToken({prompt:''});}catch(e){console.log('token req:',e);}}
+        }
+      }
     }
   }
   document.getElementById('contactModal').classList.add('active');
@@ -3014,9 +3059,13 @@ function switchTab(tab,btn){
   const _tc=document.getElementById('tab-'+tab);if(_tc)_tc.classList.add('active');
   if(btn)btn.classList.add('active');
   else{const b=document.getElementById('tabBtn-'+tab);if(b)b.classList.add('active');}
-  // ✅ Render calls HATA DIYE — ab smart switchTab override handle karta hai
-  // (dirty flag check karta hai — sirf zaroorat par render hoga)
   updateBottomNav(tab);
+  // FAB sirf home/leads/visits/followup par dikhao
+  var fab=document.querySelector('.fab');
+  if(fab){
+    var showFab=['home','leads','visits','followup'].indexOf(tab)>=0;
+    fab.style.display=showFab?'flex':'none';
+  }
 }
 function switchTabByName(tab){if(tab==='ai')tab='leads';switchTab(tab,document.getElementById('tabBtn-'+tab));}
 function toggleLC(id,btn){
@@ -3087,7 +3136,18 @@ function googleSignOut(){
 }
 async function saveToGoogleContacts(){
   const l=leads.find(x=>x.id===contactId);if(!l)return;
-  if(!googleAccessToken){showToast('⚠️ Pehle Google login karein');return;}
+  // Token nahi hai? driveAccessToken ya cached try karo
+  if(!googleAccessToken && driveAccessToken) googleAccessToken = driveAccessToken;
+  if(!googleAccessToken){
+    var cached = sessionStorage.getItem('drive_token');
+    if(cached){ googleAccessToken = cached; driveAccessToken = cached; }
+  }
+  if(!googleAccessToken){
+    showToast('⚠️ Google se connect karein — ek baar login zaruri hai');
+    document.getElementById('googleNotLoggedIn').style.display='block';
+    document.getElementById('googleLoggedIn').style.display='none';
+    return;
+  }
   const btn=document.getElementById('saveToGoogleBtn');btn.disabled=true;btn.textContent='⏳ Saving...';
   const contactBody={names:[{givenName:l.name.split(' ')[0],familyName:l.name.split(' ').slice(1).join(' ')||''}],phoneNumbers:[{value:`+91${l.phone}`,type:'mobile'}],organizations:[{name:l.project||'RE Lead',title:`${l.status} Lead`}],addresses:l.area?[{city:l.area,region:'Rajasthan',country:'India'}]:[],biographies:[{value:`RE Diary | Project: ${l.project||'—'} | Area: ${l.area||'—'} | Status: ${l.status} | Source: ${l.source||'—'}`,contentType:'TEXT_PLAIN'}]};
   try{
@@ -4193,7 +4253,7 @@ window.addEventListener('load', function(){
     }
 
     var recog = new SpeechRecognition();
-    recog.lang = 'hi-IN';
+    recog.lang = (targetId === 'fName') ? 'en-US' : 'hi-IN';
     recog.continuous = false;
     recog.interimResults = false;
     activeRecog = recog;
