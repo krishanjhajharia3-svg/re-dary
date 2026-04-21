@@ -1452,13 +1452,14 @@ body.light-mode .today-count{color:#1a1a2e!important}
     <div class="form-row">
       <div class="form-group"><label class="form-label">📱 मोबाइल *</label>
   <div style="display:flex;gap:6px;align-items:center">
-    <input class="form-input" id="fPhone" type="tel" placeholder="9876543210" style="flex:1;margin:0">
+    <input class="form-input" id="fPhone" type="tel" placeholder="9876543210" style="flex:1;margin:0" oninput="checkPhoneDup(this.value)">
     <button type="button" class="voice-btn" id="voicePhoneBtn" onclick="startVoice('fPhone','voicePhoneBtn','number')" title="Voice se number bolein">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
     </button>
   </div>
 </div>
-      <div class="form-group"><label class="form-label">🏙️ एरिया</label><input class="form-input" id="fArea" type="text" placeholder="Ajmer Road..."></div>
+      <div id="dupPhoneWarn" style="display:none;background:rgba(255,71,87,.1);border:1px solid rgba(255,71,87,.3);border-radius:8px;padding:8px 10px;font-size:11px;color:#ff4757;margin-bottom:4px">⚠️ <span id="dupPhoneMsg"></span></div>
+    <div class="form-group"><label class="form-label">🏙️ एरिया</label><input class="form-input" id="fArea" type="text" placeholder="Ajmer Road..."></div>
     </div>
     <div class="form-group">
       <label class="form-label">🏗️ Project *</label>
@@ -2704,6 +2705,94 @@ function _vcfDownload(blob, fileName){
 }
 function closeContactModal(){document.getElementById('contactModal').classList.remove('active');contactId=null;}
 
+
+// ===== QUICK ADD LEAD =====
+function openQuickAddModal(){
+  // Clear fields
+  ['qName','qPhone'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('qProject').value='';
+  document.getElementById('qStatus').value='warm';
+  var w=document.getElementById('qDupWarn'); if(w) w.style.display='none';
+  document.getElementById('quickAddModal').classList.add('active');
+  setTimeout(function(){ var n=document.getElementById('qName'); if(n) n.focus(); },300);
+}
+
+function closeQuickModal(){
+  document.getElementById('quickAddModal').classList.remove('active');
+}
+
+function checkPhoneDupQuick(val){
+  var warn=document.getElementById('qDupWarn');
+  var msg=document.getElementById('qDupMsg');
+  if(!warn||!msg) return;
+  var clean=(val||'').replace(/\D/g,'').slice(-10);
+  if(clean.length<10){ warn.style.display='none'; return; }
+  var dup=leads.find(function(l){ return l.phone && l.phone.replace(/\D/g,'').slice(-10)===clean; });
+  if(dup){
+    msg.textContent='Yeh number pehle se hai! Lead: '+dup.name+' ('+dup.status+')';
+    warn.style.display='block';
+  } else {
+    warn.style.display='none';
+  }
+}
+
+function quickSaveLead(){
+  var name=(document.getElementById('qName').value||'').trim();
+  var phone=(document.getElementById('qPhone').value||'').trim();
+  if(!name||!phone){ showToast('⚠️ Naam aur Number zaroori hai!'); return; }
+
+  // Duplicate check
+  var clean=phone.replace(/\D/g,'').slice(-10);
+  var dup=leads.find(function(l){ return l.phone && l.phone.replace(/\D/g,'').slice(-10)===clean; });
+  if(dup){ if(!confirm('⚠️ Yeh number pehle se hai!\nLead: '+dup.name+'\n\nPhir bhi save karein?')) return; }
+
+  var ld={
+    id: generateId(),
+    name: name,
+    phone: phone,
+    project: document.getElementById('qProject').value||'',
+    status: document.getElementById('qStatus').value||'warm',
+    source: 'Direct',
+    area: '',
+    lastTalk: '',
+    nextDate: '',
+    nextTime: '',
+    nextNote: '',
+    createdAt: new Date().toISOString(),
+    lastUpdated: new Date().toISOString(),
+    _incomplete: true  // baad mein complete karna hai
+  };
+
+  leads.unshift(ld);
+  saveData();
+  renderLeads(); updateStats(); renderHomeDashboard();
+
+  closeQuickModal();
+  switchTabByName('leads');
+  showToast('⚡ Lead add ho gaya! Edit karke details bharein.','success');
+  setTimeout(function(){ showConfetti(50,50); },200);
+
+  // Firebase sync
+  if(window._fbUser){ setTimeout(function(){ syncToFirestore(); },2000); }
+}
+
+function quickSaveFull(){
+  // Quick modal ka data full modal mein le jaao
+  var name=(document.getElementById('qName').value||'').trim();
+  var phone=(document.getElementById('qPhone').value||'').trim();
+  var project=document.getElementById('qProject').value||'';
+  var status=document.getElementById('qStatus').value||'warm';
+  closeQuickModal();
+  openAddModal();
+  setTimeout(function(){
+    if(name){ document.getElementById('fName').value=name; }
+    if(phone){ document.getElementById('fPhone').value=phone; checkPhoneDup(phone); }
+    if(project){ document.getElementById('fProject').value=project; }
+    if(status){ document.getElementById('fStatus').value=status; }
+  },300);
+}
+// ===== END QUICK ADD =====
+
 function openAddModal(){
   editingId=null;
   document.getElementById('modalTitle').textContent='➕ नया Lead जोड़ें';
@@ -2753,10 +2842,37 @@ function checkOtherProject(){
   if(v!=='Other')document.getElementById('fProjectOther').value='';
 }
 
+
+// Real-time duplicate phone check
+function checkPhoneDup(val){
+  var warn = document.getElementById('dupPhoneWarn');
+  var msg = document.getElementById('dupPhoneMsg');
+  if(!warn || !msg) return;
+  var clean = (val||'').replace(/\D/g,'').slice(-10);
+  if(clean.length < 10){ warn.style.display='none'; return; }
+  var dup = leads.find(function(l){
+    return l.id !== editingId && l.phone && l.phone.replace(/\D/g,'').slice(-10) === clean;
+  });
+  if(dup){
+    msg.textContent = 'Yeh number pehle se hai! Lead: ' + dup.name + ' (' + dup.status + ')';
+    warn.style.display = 'block';
+  } else {
+    warn.style.display = 'none';
+  }
+}
+
 function saveLead(){
   const name=document.getElementById('fName').value.trim();
   const phone=document.getElementById('fPhone').value.trim();
   if(!name||!phone){showToast('⚠️ नाम और मोबाइल नंबर ज़रूरी है!');return;}
+  // ── Duplicate phone check ──
+  const cleanPhone = phone.replace(/\D/g,'').slice(-10); // last 10 digits
+  const dupLead = leads.find(function(l){
+    return l.id !== editingId && l.phone && l.phone.replace(/\D/g,'').slice(-10) === cleanPhone;
+  });
+  if(dupLead){
+    if(!confirm('⚠️ Yeh number pehle se hai!\n\nLead: ' + dupLead.name + '\nStatus: ' + dupLead.status + '\n\nPhir bhi save karna hai?')) return;
+  }
   let project=document.getElementById('fProject').value;
   if(project==='Other')project=document.getElementById('fProjectOther').value.trim()||'Other';
   const ld={name,phone,area:document.getElementById('fArea').value.trim(),project,status:document.getElementById('fStatus').value,source:document.getElementById('fSource').value,lastTalk:document.getElementById('fLastTalk').value.trim(),nextDate:document.getElementById('fNextDate').value,nextTime:document.getElementById('fNextTime').value,nextNote:document.getElementById('fNextNote').value.trim(),lastUpdated:new Date().toISOString()};
