@@ -1604,8 +1604,8 @@ body.light-mode .today-count{color:#1a1a2e!important}
     <!-- Processing state -->
     <div id="scannerProcessing" style="display:none;text-align:center;padding:20px 0">
       <div style="font-size:32px;margin-bottom:12px">🤖</div>
-      <div style="font-size:14px;color:var(--text-primary);font-weight:600;margin-bottom:6px">AI Card Read कर रहा है...</div>
-      <div style="font-size:12px;color:var(--text-secondary)">Naam, number, company dhundh raha hai</div>
+      <div style="font-size:14px;color:var(--text-primary);font-weight:600;margin-bottom:6px">Card Read हो रहा है...</div>
+      <div style="font-size:12px;color:var(--text-secondary)">Naam, number, company dhundh raha hai — thoda time lagega</div>
       <div style="margin-top:16px;height:4px;background:var(--bg-card2);border-radius:4px;overflow:hidden">
         <div id="scanProgressBar" style="height:100%;width:0%;background:var(--accent-primary);border-radius:4px;transition:width .3s"></div>
       </div>
@@ -4737,59 +4737,102 @@ function processCardImage(input){
 
 async function callClaudeCardOCR(base64Data, mimeType, progressInterval, bar){
   try {
-    var response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 500,
-        messages: [{
-          role: 'user',
-          content: [
-            {
-              type: 'image',
-              source: { type: 'base64', media_type: mimeType, data: base64Data }
-            },
-            {
-              type: 'text',
-              text: 'Yeh visiting card hai. Isse carefully padhkar sirf JSON format mein return karo (koi extra text nahi): {"name": "full name", "phone": "10 digit mobile number only", "company": "company name", "area": "city or area"}. Agar koi field nahi mili to empty string do. Phone mein sirf digits, spaces ya + sign rakhna.'
-            }
-          ]
-        }]
-      })
+    // Tesseract.js load karo agar nahi hai
+    if(typeof Tesseract === 'undefined'){
+      await new Promise(function(resolve, reject){
+        var s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+        s.onload = resolve;
+        s.onerror = reject;
+        document.head.appendChild(s);
+      });
+    }
+
+    // Progress bar animate
+    var prog = 10;
+    var progInc = setInterval(function(){
+      prog = Math.min(prog + 5, 80);
+      bar.style.width = prog + '%';
+    }, 400);
+
+    // Image src banao
+    var imgSrc = 'data:' + mimeType + ';base64,' + base64Data;
+
+    // Tesseract OCR chalao
+    var result = await Tesseract.recognize(imgSrc, 'eng+hin', {
+      logger: function(m){ if(m.progress) bar.style.width = Math.round(m.progress * 90) + '%'; }
     });
-    
+
+    clearInterval(progInc);
     clearInterval(progressInterval);
+    bar.style.width = '95%';
+
+    var text = result.data.text || '';
+    if(!text.trim()) throw new Error('Card ka text nahi padha — photo clear lo, achhi roshni mein lo');
+
+    // Smart parsing — naam, phone, company, area dhundho
+    var lines = text.split('\n').map(function(l){ return l.trim(); }).filter(function(l){ return l.length > 0; });
+
+    // Phone: 10 digit number dhundho
+    var phoneMatch = text.match(/(?:\+91[\s-]?)?[6-9]\d{9}/);
+    var phone = phoneMatch ? phoneMatch[0].replace(/[^0-9]/g,'').slice(-10) : '';
+
+    // Email dhundho
+    var emailMatch = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+    var email = emailMatch ? emailMatch[0] : '';
+
+    // Naam: pehli meaningful line jo number/email nahi ho
+    var name = '';
+    var skipWords = ['pvt','ltd','private','limited','co.','company','mr.','mrs.','dr.','prof.','mob','phone','tel','email','www','http'];
+    for(var i=0; i<Math.min(lines.length,5); i++){
+      var ln = lines[i];
+      var lnLower = ln.toLowerCase();
+      var isSkip = skipWords.some(function(w){ return lnLower.indexOf(w) >= 0; });
+      if(!isSkip && !/\d{4,}/.test(ln) && !/@/.test(ln) && ln.length > 2 && ln.length < 50){
+        name = ln; break;
+      }
+    }
+
+    // Company: "Pvt Ltd" ya "Limited" wali line
+    var company = '';
+    for(var j=0; j<lines.length; j++){
+      var cl = lines[j].toLowerCase();
+      if(cl.indexOf('pvt') >= 0 || cl.indexOf('ltd') >= 0 || cl.indexOf('limited') >= 0 ||
+         cl.indexOf('enterprise') >= 0 || cl.indexOf('group') >= 0 || cl.indexOf('associate') >= 0 ||
+         cl.indexOf('realty') >= 0 || cl.indexOf('estate') >= 0 || cl.indexOf('builder') >= 0){
+        company = lines[j]; break;
+      }
+    }
+
+    // Area: Jaipur ya city dhundho
+    var area = '';
+    var cityWords = ['jaipur','delhi','mumbai','bangalore','pune','hyderabad','chennai','kolkata',
+                     'ajmer','jodhpur','kota','udaipur','bikaner','alwar','sikar','rajasthan'];
+    for(var k=0; k<lines.length; k++){
+      var al = lines[k].toLowerCase();
+      if(cityWords.some(function(city){ return al.indexOf(city) >= 0; })){
+        area = lines[k]; break;
+      }
+    }
+
     bar.style.width = '100%';
-    
-    if(!response.ok) throw new Error('API error: ' + response.status);
-    
-    var data = await response.json();
-    var text = data.content && data.content[0] && data.content[0].text ? data.content[0].text : '';
-    
-    // Parse JSON from response
-    var jsonMatch = text.match(/\{[^}]+\}/);
-    if(!jsonMatch) throw new Error('Card mein text nahi mila');
-    
-    var result = JSON.parse(jsonMatch[0]);
-    
+
     // Fill result fields
-    document.getElementById('scanName').value = result.name || '';
-    document.getElementById('scanPhone').value = (result.phone || '').replace(/[^0-9+]/g,'').slice(-10);
-    document.getElementById('scanCompany').value = result.company || '';
-    document.getElementById('scanArea').value = result.area || '';
-    
-    // Show result
+    document.getElementById('scanName').value = name;
+    document.getElementById('scanPhone').value = phone;
+    document.getElementById('scanCompany').value = company;
+    document.getElementById('scanArea').value = area;
+
     setTimeout(function(){
       document.getElementById('scannerProcessing').style.display='none';
       document.getElementById('scannerResult').style.display='block';
     }, 300);
-    
+
   } catch(err) {
     clearInterval(progressInterval);
     document.getElementById('scannerProcessing').style.display='none';
     document.getElementById('scannerError').style.display='block';
-    document.getElementById('scanErrorMsg').textContent = err.message || 'Card read nahi hua — dobara try karo';
+    document.getElementById('scanErrorMsg').textContent = err.message || 'Card read nahi hua — clear photo lo';
   }
 }
 
