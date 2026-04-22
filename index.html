@@ -1441,6 +1441,12 @@ body.light-mode .today-count{color:#1a1a2e!important}
   <div class="modal">
     <div class="modal-handle"></div>
     <div class="modal-title" id="modalTitle">➕ नया Lead जोड़ें</div>
+    <!-- Card Scanner Button -->
+    <div id="cardScannerSection" style="display:block">
+      <button type="button" onclick="openCardScanner()" style="padding:6px 12px;background:rgba(79,124,255,.12);border:1px solid rgba(79,124,255,.3);border-radius:8px;color:var(--accent-primary);font-size:11px;font-weight:600;cursor:pointer;margin-bottom:12px;font-family:Inter,sans-serif">
+        📷 Card Scan
+      </button>
+    </div>
     <div class="form-group"><label class="form-label">👤 नाम *</label>
   <div style="display:flex;gap:6px;align-items:center">
     <input class="form-input" id="fName" type="text" placeholder="Lead का नाम" style="flex:1;margin:0">
@@ -1573,6 +1579,77 @@ body.light-mode .today-count{color:#1a1a2e!important}
   </div>
 </div>
 
+
+
+<!-- CARD SCANNER MODAL -->
+<div class="modal-overlay" id="cardScannerModal">
+  <div class="modal" style="max-height:90vh">
+    <div class="modal-handle"></div>
+    <div class="modal-title" style="color:var(--accent-primary)">📷 Card Scanner</div>
+    
+    <!-- Camera / Upload choice -->
+    <div id="scannerChoice" style="display:block">
+      <p style="font-size:12px;color:var(--text-secondary);text-align:center;margin-bottom:16px;line-height:1.6">Visiting card ka photo lo ya gallery se choose karo — AI naam, number, company automatic fill kar dega</p>
+      <input type="file" id="cardImageInput" accept="image/*" capture="environment" style="display:none" onchange="processCardImage(this)">
+      <button class="btn-primary" onclick="document.getElementById('cardImageInput').click()" style="margin-bottom:8px">
+        📸 Camera se Photo Lo
+      </button>
+      <input type="file" id="cardGalleryInput" accept="image/*" style="display:none" onchange="processCardImage(this)">
+      <button class="btn-secondary" onclick="document.getElementById('cardGalleryInput').click()" style="margin-bottom:8px">
+        🖼️ Gallery se Choose Karo
+      </button>
+      <button class="btn-secondary" onclick="closeCardScanner()">रद्द करें</button>
+    </div>
+    
+    <!-- Processing state -->
+    <div id="scannerProcessing" style="display:none;text-align:center;padding:20px 0">
+      <div style="font-size:32px;margin-bottom:12px">🤖</div>
+      <div style="font-size:14px;color:var(--text-primary);font-weight:600;margin-bottom:6px">AI Card Read कर रहा है...</div>
+      <div style="font-size:12px;color:var(--text-secondary)">Naam, number, company dhundh raha hai</div>
+      <div style="margin-top:16px;height:4px;background:var(--bg-card2);border-radius:4px;overflow:hidden">
+        <div id="scanProgressBar" style="height:100%;width:0%;background:var(--accent-primary);border-radius:4px;transition:width .3s"></div>
+      </div>
+    </div>
+    
+    <!-- Result state -->
+    <div id="scannerResult" style="display:none">
+      <div style="background:var(--bg-card2);border-radius:12px;padding:12px;margin-bottom:14px">
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;font-weight:600">📋 AI ne yeh information mili:</div>
+        <div id="cardImagePreview" style="margin-bottom:10px;border-radius:8px;overflow:hidden;max-height:120px;text-align:center">
+          <img id="cardPreviewImg" style="max-height:120px;border-radius:8px;object-fit:contain" src="" alt="card">
+        </div>
+        <div class="form-group" style="margin-bottom:8px">
+          <label class="form-label">👤 Naam</label>
+          <input class="form-input" id="scanName" type="text" placeholder="naam...">
+        </div>
+        <div class="form-group" style="margin-bottom:8px">
+          <label class="form-label">📱 Phone</label>
+          <input class="form-input" id="scanPhone" type="tel" placeholder="number...">
+        </div>
+        <div class="form-group" style="margin-bottom:8px">
+          <label class="form-label">🏢 Company</label>
+          <input class="form-input" id="scanCompany" type="text" placeholder="company...">
+        </div>
+        <div class="form-group" style="margin-bottom:0">
+          <label class="form-label">📍 Area</label>
+          <input class="form-input" id="scanArea" type="text" placeholder="area/city...">
+        </div>
+      </div>
+      <button class="btn-primary" onclick="applyScannedCard()" style="margin-bottom:8px">✅ Lead Form mein Fill Karo</button>
+      <button class="btn-secondary" onclick="rescanCard()">🔄 Dobara Scan Karo</button>
+      <button class="btn-secondary" onclick="closeCardScanner()" style="margin-top:4px">रद्द करें</button>
+    </div>
+    
+    <!-- Error state -->
+    <div id="scannerError" style="display:none;text-align:center;padding:16px 0">
+      <div style="font-size:28px;margin-bottom:10px">😕</div>
+      <div style="font-size:13px;color:var(--text-primary);font-weight:600;margin-bottom:6px" id="scanErrorMsg">Card read nahi hua</div>
+      <div style="font-size:11px;color:var(--text-secondary);margin-bottom:16px">Clear photo lo — card seedha aur achhi roshni mein ho</div>
+      <button class="btn-primary" onclick="rescanCard()" style="margin-bottom:8px">🔄 Dobara Try Karo</button>
+      <button class="btn-secondary" onclick="closeCardScanner()">रद्द करें</button>
+    </div>
+  </div>
+</div>
 
 <!-- ONBOARDING SCREEN -->
 <div id="onboardScreen">
@@ -3387,7 +3464,7 @@ async function performDriveRestore(){
 
 window.addEventListener('load',()=>{setTimeout(()=>{initGoogleAuth();initDriveAuth();},800);});
 
-['leadModal','contactModal','visitModal','exportModal','callModal','callHistoryModal','leadHistoryModal'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('click',function(e){if(e.target===this)this.classList.remove('active');});});
+['leadModal','contactModal','visitModal','exportModal','callModal','callHistoryModal','leadHistoryModal','cardScannerModal'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('click',function(e){if(e.target===this)this.classList.remove('active');});});
 
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){
@@ -4594,6 +4671,150 @@ window.addEventListener('load', function(){
   };
 })();
 // ===== END FOLLOW-UP FIXER =====
+
+
+// ===== VISITING CARD SCANNER =====
+var _cardScannerOpen = false;
+
+function openCardScanner(){
+  _cardScannerOpen = true;
+  document.getElementById('cardScannerModal').classList.add('active');
+  document.getElementById('scannerChoice').style.display='block';
+  document.getElementById('scannerProcessing').style.display='none';
+  document.getElementById('scannerResult').style.display='none';
+  document.getElementById('scannerError').style.display='none';
+}
+
+function closeCardScanner(){
+  document.getElementById('cardScannerModal').classList.remove('active');
+  _cardScannerOpen = false;
+  // Reset inputs
+  document.getElementById('cardImageInput').value='';
+  document.getElementById('cardGalleryInput').value='';
+}
+
+function rescanCard(){
+  document.getElementById('scannerChoice').style.display='block';
+  document.getElementById('scannerProcessing').style.display='none';
+  document.getElementById('scannerResult').style.display='none';
+  document.getElementById('scannerError').style.display='none';
+  document.getElementById('cardImageInput').value='';
+  document.getElementById('cardGalleryInput').value='';
+}
+
+function processCardImage(input){
+  if(!input.files || !input.files[0]) return;
+  var file = input.files[0];
+  
+  // Show processing
+  document.getElementById('scannerChoice').style.display='none';
+  document.getElementById('scannerProcessing').style.display='block';
+  document.getElementById('scannerResult').style.display='none';
+  document.getElementById('scannerError').style.display='none';
+  
+  // Animate progress bar
+  var progress = 0;
+  var bar = document.getElementById('scanProgressBar');
+  var progressInterval = setInterval(function(){
+    progress = Math.min(progress + Math.random()*15, 85);
+    bar.style.width = progress + '%';
+  }, 200);
+  
+  // Read file as base64
+  var reader = new FileReader();
+  reader.onload = function(e){
+    var base64Data = e.target.result.split(',')[1];
+    var mimeType = file.type || 'image/jpeg';
+    
+    // Show preview
+    document.getElementById('cardPreviewImg').src = e.target.result;
+    
+    // Call Claude API for OCR
+    callClaudeCardOCR(base64Data, mimeType, progressInterval, bar);
+  };
+  reader.readAsDataURL(file);
+}
+
+async function callClaudeCardOCR(base64Data, mimeType, progressInterval, bar){
+  try {
+    var response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 500,
+        messages: [{
+          role: 'user',
+          content: [
+            {
+              type: 'image',
+              source: { type: 'base64', media_type: mimeType, data: base64Data }
+            },
+            {
+              type: 'text',
+              text: 'Yeh visiting card hai. Isse carefully padhkar sirf JSON format mein return karo (koi extra text nahi): {"name": "full name", "phone": "10 digit mobile number only", "company": "company name", "area": "city or area"}. Agar koi field nahi mili to empty string do. Phone mein sirf digits, spaces ya + sign rakhna.'
+            }
+          ]
+        }]
+      })
+    });
+    
+    clearInterval(progressInterval);
+    bar.style.width = '100%';
+    
+    if(!response.ok) throw new Error('API error: ' + response.status);
+    
+    var data = await response.json();
+    var text = data.content && data.content[0] && data.content[0].text ? data.content[0].text : '';
+    
+    // Parse JSON from response
+    var jsonMatch = text.match(/\{[^}]+\}/);
+    if(!jsonMatch) throw new Error('Card mein text nahi mila');
+    
+    var result = JSON.parse(jsonMatch[0]);
+    
+    // Fill result fields
+    document.getElementById('scanName').value = result.name || '';
+    document.getElementById('scanPhone').value = (result.phone || '').replace(/[^0-9+]/g,'').slice(-10);
+    document.getElementById('scanCompany').value = result.company || '';
+    document.getElementById('scanArea').value = result.area || '';
+    
+    // Show result
+    setTimeout(function(){
+      document.getElementById('scannerProcessing').style.display='none';
+      document.getElementById('scannerResult').style.display='block';
+    }, 300);
+    
+  } catch(err) {
+    clearInterval(progressInterval);
+    document.getElementById('scannerProcessing').style.display='none';
+    document.getElementById('scannerError').style.display='block';
+    document.getElementById('scanErrorMsg').textContent = err.message || 'Card read nahi hua — dobara try karo';
+  }
+}
+
+function applyScannedCard(){
+  var name = document.getElementById('scanName').value.trim();
+  var phone = document.getElementById('scanPhone').value.trim();
+  var company = document.getElementById('scanCompany').value.trim();
+  var area = document.getElementById('scanArea').value.trim();
+  
+  if(!name && !phone){ showToast('⚠️ Naam ya number nahi mila — manually fill karo'); closeCardScanner(); return; }
+  
+  // Fill lead form
+  if(name) document.getElementById('fName').value = name;
+  if(phone){ document.getElementById('fPhone').value = phone; checkPhoneDup(phone); }
+  if(area) document.getElementById('fArea').value = area;
+  // Company ko notes mein add karo
+  if(company){
+    var existNote = document.getElementById('fLastTalk').value;
+    document.getElementById('fLastTalk').value = existNote ? existNote + ' | Company: ' + company : 'Company: ' + company;
+  }
+  
+  closeCardScanner();
+  showToast('✅ Card details fill ho gayi — baaki fill karke save karo!', 'success');
+}
+// ===== END CARD SCANNER =====
 
 </script>
 
