@@ -1124,6 +1124,9 @@ body.light-mode .notif-close{background:rgba(0,0,0,.08)!important;border-color:r
     <button class="icon-btn" onclick="showExportOptions()" title="Export">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
     </button>
+    <button class="icon-btn" onclick="openSettings()" title="Settings" id="settingsBtn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+    </button>
   </div>
 </div>
 
@@ -1534,7 +1537,12 @@ body.light-mode .notif-close{background:rgba(0,0,0,.08)!important;border-color:r
     </div>
     <div class="form-group" id="otherProjectGroup">
       <label class="form-label">✏️ Project का नाम लिखें</label>
-      <input class="form-input" id="fProjectOther" type="text" placeholder="Project name likhein...">
+      <input class="form-input" id="fProjectOther" type="text" placeholder="Project name likhein..." oninput="detectAreaInProject(this.value)">
+      <div id="projectAreaWarn" style="display:none;margin-top:6px;background:rgba(240,180,41,.1);border:1px solid rgba(240,180,41,.3);border-radius:8px;padding:8px 10px">
+        <div style="font-size:11px;color:var(--accent-gold);font-weight:600;margin-bottom:4px">📍 Yeh area lagta hai, project nahi!</div>
+        <div style="font-size:11px;color:var(--text-secondary);margin-bottom:6px" id="projectAreaMsg"></div>
+        <button type="button" onclick="moveToArea()" style="padding:4px 10px;background:var(--accent-gold);border:none;border-radius:6px;color:#fff;font-size:11px;cursor:pointer;font-weight:600">📍 Area field mein daalo</button>
+      </div>
     </div>
     <div class="form-row">
       <div class="form-group">
@@ -1632,6 +1640,186 @@ body.light-mode .notif-close{background:rgba(0,0,0,.08)!important;border-color:r
   </div>
 </div>
 
+
+
+<!-- ═══════ SETTINGS MODAL ═══════ -->
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal" style="max-height:92vh;overflow-y:auto">
+    <div class="modal-handle"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div class="modal-title" style="margin:0">⚙️ Settings</div>
+      <button onclick="closeSettings()" style="background:none;border:none;color:var(--text-muted);font-size:20px;cursor:pointer;padding:4px">✕</button>
+    </div>
+
+    <!-- PROFILE SECTION -->
+    <div style="background:var(--bg-card2);border-radius:14px;padding:14px;margin-bottom:12px">
+      <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px">👤 Profile</div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+        <div id="settingsAvatarPreview" onclick="document.getElementById('settingsPhotoInput').click()" style="width:56px;height:56px;border-radius:16px;background:var(--accent-primary);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;color:#fff;cursor:pointer;position:relative;overflow:hidden;flex-shrink:0">K</div>
+        <input type="file" id="settingsPhotoInput" accept="image/*" style="display:none" onchange="handleProfilePhoto(this)">
+        <div style="flex:1">
+          <div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px">Photo ke liye tap karein</div>
+          <button onclick="document.getElementById('settingsPhotoInput').click()" style="font-size:11px;padding:4px 10px;background:var(--accent-primary);border:none;border-radius:8px;color:#fff;cursor:pointer">📸 Photo Change</button>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <div>
+          <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Naam</label>
+          <input class="form-input" id="settName" style="margin:0;font-size:13px" placeholder="Aapka naam">
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Phone</label>
+          <input class="form-input" id="settPhone" type="tel" style="margin:0;font-size:13px" placeholder="9876543210">
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">City</label>
+          <input class="form-input" id="settCity" style="margin:0;font-size:13px" placeholder="Jaipur">
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Profession</label>
+          <input class="form-input" id="settProfession" style="margin:0;font-size:13px" placeholder="Real Estate">
+        </div>
+      </div>
+      <button onclick="saveProfileSettings()" class="btn-primary" style="margin-top:10px;padding:10px">💾 Profile Save करें</button>
+    </div>
+
+    <!-- THEME SECTION -->
+    <div style="background:var(--bg-card2);border-radius:14px;padding:14px;margin-bottom:12px">
+      <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px">🎨 Theme</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+        <button id="theme-dark" onclick="applyThemeSetting('dark')" style="padding:12px 8px;border-radius:12px;border:2px solid var(--accent-primary);background:#0f1923;color:#fff;cursor:pointer;font-size:11px;font-weight:600">🌙 Dark Navy</button>
+        <button id="theme-amoled" onclick="applyThemeSetting('amoled')" style="padding:12px 8px;border-radius:12px;border:1px solid var(--border);background:#000;color:#fff;cursor:pointer;font-size:11px;font-weight:600">⚫ AMOLED</button>
+        <button id="theme-light" onclick="applyThemeSetting('light')" style="padding:12px 8px;border-radius:12px;border:1px solid var(--border);background:#f5f5f5;color:#1a1a2e;cursor:pointer;font-size:11px;font-weight:600">☀️ Light</button>
+      </div>
+      <div style="margin-top:10px">
+        <div style="font-size:11px;color:var(--text-muted);margin-bottom:6px">Font Size</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+          <button id="font-small" onclick="applyFontSize('small')" style="padding:8px;border-radius:10px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-secondary);cursor:pointer;font-size:11px">A- Chhota</button>
+          <button id="font-normal" onclick="applyFontSize('normal')" style="padding:8px;border-radius:10px;border:2px solid var(--accent-primary);background:var(--bg-card);color:var(--text-primary);cursor:pointer;font-size:13px;font-weight:600">A Normal</button>
+          <button id="font-large" onclick="applyFontSize('large')" style="padding:8px;border-radius:10px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-secondary);cursor:pointer;font-size:15px">A+ Bada</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECURITY SECTION -->
+    <div style="background:var(--bg-card2);border-radius:14px;padding:14px;margin-bottom:12px">
+      <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px">🔒 Security</div>
+      <div style="margin-bottom:10px">
+        <div style="font-size:12px;color:var(--text-primary);font-weight:600;margin-bottom:8px">PIN Change</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <input class="form-input" id="settOldPin" type="password" maxlength="4" style="margin:0;font-size:13px" placeholder="Purana PIN">
+          <input class="form-input" id="settNewPin" type="password" maxlength="4" style="margin:0;font-size:13px" placeholder="Naya PIN">
+        </div>
+        <button onclick="changePinSetting()" class="btn-secondary" style="margin-top:8px;width:100%;padding:9px;font-size:12px">🔑 PIN Change करें</button>
+      </div>
+      <div>
+        <div style="font-size:12px;color:var(--text-primary);font-weight:600;margin-bottom:8px">PIN Lock Timer</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">
+          <button id="pin-1" onclick="setPinTimer(1)" style="padding:8px 4px;border-radius:9px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-secondary);cursor:pointer;font-size:11px">1 min</button>
+          <button id="pin-5" onclick="setPinTimer(5)" style="padding:8px 4px;border-radius:9px;border:2px solid var(--accent-primary);background:var(--bg-card);color:var(--text-primary);cursor:pointer;font-size:11px;font-weight:600">5 min</button>
+          <button id="pin-15" onclick="setPinTimer(15)" style="padding:8px 4px;border-radius:9px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-secondary);cursor:pointer;font-size:11px">15 min</button>
+          <button id="pin-never" onclick="setPinTimer(0)" style="padding:8px 4px;border-radius:9px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-secondary);cursor:pointer;font-size:11px">Never</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROJECTS & SOURCES -->
+    <div style="background:var(--bg-card2);border-radius:14px;padding:14px;margin-bottom:12px">
+      <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px">🏗️ Projects & Sources</div>
+      <div style="margin-bottom:10px">
+        <div style="font-size:12px;color:var(--text-primary);font-weight:600;margin-bottom:8px">Projects</div>
+        <div id="settProjectsList" style="margin-bottom:8px"></div>
+        <div style="display:flex;gap:8px">
+          <input class="form-input" id="settNewProject" style="margin:0;font-size:12px;flex:1" placeholder="Naya project naam">
+          <button onclick="addProject()" style="padding:8px 12px;background:var(--accent-primary);border:none;border-radius:9px;color:#fff;cursor:pointer;font-size:13px;flex-shrink:0">+ Add</button>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:12px;color:var(--text-primary);font-weight:600;margin-bottom:8px">Sources</div>
+        <div id="settSourcesList" style="margin-bottom:8px"></div>
+        <div style="display:flex;gap:8px">
+          <input class="form-input" id="settNewSource" style="margin:0;font-size:12px;flex:1" placeholder="Naya source naam">
+          <button onclick="addSource()" style="padding:8px 12px;background:var(--accent-primary);border:none;border-radius:9px;color:#fff;cursor:pointer;font-size:13px;flex-shrink:0">+ Add</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- NOTIFICATIONS -->
+    <div style="background:var(--bg-card2);border-radius:14px;padding:14px;margin-bottom:12px">
+      <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px">🔔 Notifications</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div>
+          <div style="font-size:12px;color:var(--text-primary);font-weight:600">Morning Briefing</div>
+          <div style="font-size:11px;color:var(--text-muted)">Subah ka daily summary</div>
+        </div>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+          <input type="checkbox" id="settMorningOn" onchange="saveSetting('morningBriefing',this.checked)" style="width:16px;height:16px;accent-color:var(--accent-primary)">
+        </label>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px">
+        <button id="morn-7" onclick="setMorningTime('07:00')" style="padding:7px 4px;border-radius:9px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-secondary);cursor:pointer;font-size:11px">7 AM</button>
+        <button id="morn-8" onclick="setMorningTime('08:00')" style="padding:7px 4px;border-radius:9px;border:2px solid var(--accent-primary);background:var(--bg-card);color:var(--text-primary);cursor:pointer;font-size:11px;font-weight:600">8 AM</button>
+        <button id="morn-9" onclick="setMorningTime('09:00')" style="padding:7px 4px;border-radius:9px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-secondary);cursor:pointer;font-size:11px">9 AM</button>
+        <button id="morn-10" onclick="setMorningTime('10:00')" style="padding:7px 4px;border-radius:9px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-secondary);cursor:pointer;font-size:11px">10 AM</button>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <div style="font-size:12px;color:var(--text-primary);font-weight:600">DND Hours</div>
+          <div style="font-size:11px;color:var(--text-muted)">Raat ko notifications band</div>
+        </div>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+          <input type="checkbox" id="settDndOn" onchange="saveSetting('dndEnabled',this.checked)" style="width:16px;height:16px;accent-color:var(--accent-primary)">
+        </label>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+        <div>
+          <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Shuru</label>
+          <input type="time" class="form-input" id="settDndStart" value="22:00" style="margin:0;font-size:12px" onchange="saveSetting('dndStart',this.value)">
+        </div>
+        <div>
+          <label style="font-size:11px;color:var(--text-muted);display:block;margin-bottom:4px">Khatam</label>
+          <input type="time" class="form-input" id="settDndEnd" value="08:00" style="margin:0;font-size:12px" onchange="saveSetting('dndEnd',this.value)">
+        </div>
+      </div>
+    </div>
+
+    <!-- APP BEHAVIOR -->
+    <div style="background:var(--bg-card2);border-radius:14px;padding:14px;margin-bottom:12px">
+      <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px">⚙️ App Behavior</div>
+      <div style="margin-bottom:10px">
+        <div style="font-size:12px;color:var(--text-primary);font-weight:600;margin-bottom:6px">Default Follow-up Days</div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px">
+          <button id="fu-1" onclick="setDefaultFollowup(1)" style="padding:8px 4px;border-radius:9px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-secondary);cursor:pointer;font-size:12px">1</button>
+          <button id="fu-2" onclick="setDefaultFollowup(2)" style="padding:8px 4px;border-radius:9px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-secondary);cursor:pointer;font-size:12px">2</button>
+          <button id="fu-3" onclick="setDefaultFollowup(3)" style="padding:8px 4px;border-radius:9px;border:2px solid var(--accent-primary);background:var(--bg-card);color:var(--text-primary);cursor:pointer;font-size:12px;font-weight:600">3</button>
+          <button id="fu-5" onclick="setDefaultFollowup(5)" style="padding:8px 4px;border-radius:9px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-secondary);cursor:pointer;font-size:12px">5</button>
+          <button id="fu-7" onclick="setDefaultFollowup(7)" style="padding:8px 4px;border-radius:9px;border:1px solid var(--border);background:var(--bg-card);color:var(--text-secondary);cursor:pointer;font-size:12px">7</button>
+        </div>
+        <div style="font-size:10px;color:var(--text-muted);margin-top:4px">Call ke baad auto next follow-up kitne din baad set ho</div>
+      </div>
+      <div>
+        <div style="font-size:12px;color:var(--text-primary);font-weight:600;margin-bottom:6px">Default WA Template</div>
+        <textarea class="form-textarea" id="settWaTemplate" rows="3" placeholder="Namaste {naam} Ji! Aapne {project} ke baare mein enquiry ki thi..." style="font-size:12px" onchange="saveSetting('waTemplate',this.value)"></textarea>
+        <div style="font-size:10px;color:var(--text-muted);margin-top:2px">{naam} aur {project} auto fill hoga</div>
+      </div>
+    </div>
+
+    <!-- DATA & BACKUP -->
+    <div style="background:var(--bg-card2);border-radius:14px;padding:14px;margin-bottom:12px">
+      <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:12px">💾 Data & Backup</div>
+      <button onclick="backupData()" class="btn-secondary" style="width:100%;margin-bottom:8px;padding:10px;font-size:12px">💾 Backup Download करें (JSON)</button>
+      <label style="display:block;width:100%">
+        <div class="btn-secondary" style="width:100%;padding:10px;font-size:12px;text-align:center;cursor:pointer;border-radius:12px;border:1px solid var(--border);box-sizing:border-box">📂 Backup Restore करें</div>
+        <input type="file" accept=".json" style="display:none" onchange="restoreData(this)">
+      </label>
+    </div>
+
+
+
+    <div style="text-align:center;padding:8px;font-size:10px;color:var(--text-muted)">Leado CRM v2.0 · Made with ❤️ for Real Estate</div>
+  </div>
+</div>
+<!-- ═══════ END SETTINGS MODAL ═══════ -->
 
 <!-- ONBOARDING SCREEN -->
 <div id="onboardScreen">
@@ -1789,6 +1977,7 @@ body.light-mode .notif-close{background:rgba(0,0,0,.08)!important;border-color:r
         <option value="warm">⭐ Interested</option>
         <option value="cold">❄️ Thinking</option>
         <option value="converted">✅ Deal Done</option>
+        <option value="dead">🚫 Not Interested</option>
       </select>
     </div>
     <div style="background:rgba(212,168,67,.08);border:1px solid rgba(212,168,67,.2);border-radius:12px;padding:12px;margin-bottom:6px">
@@ -2878,6 +3067,22 @@ function quickSaveFull(){
 // ===== END QUICK ADD =====
 
 function openAddModal(){
+  // Projects dropdown dynamically update karo settings se
+  var projSel = document.getElementById('fProject');
+  if(projSel){
+    var currVal = projSel.value;
+    projSel.innerHTML = '<option value="">-- Project चुनें --</option>'
+      + getProjects().map(function(p){ return '<option value="'+p+'">'+p+'</option>'; }).join('')
+      + '<option value="Other">Other (अन्य Project)</option>';
+    if(currVal) projSel.value = currVal;
+  }
+  // Sources dropdown dynamically update karo
+  var srcSel = document.getElementById('fSource');
+  if(srcSel){
+    var currSrc = srcSel.value;
+    srcSel.innerHTML = getSources().map(function(s){ return '<option value="'+s+'">'+s+'</option>'; }).join('');
+    if(currSrc) srcSel.value = currSrc;
+  }
   editingId=null;
   document.getElementById('modalTitle').textContent='➕ नया Lead जोड़ें';
   document.getElementById('deleteLeadBtn').style.display='none';
@@ -2902,7 +3107,13 @@ function editLead(id){
   document.getElementById('fArea').value=l.area||'';
   const kp=['Imperial Estate','Imperial Galaxy','Solitair Home','Dream Town','Govind Vihar'];
   if(kp.includes(l.project)){document.getElementById('fProject').value=l.project;document.getElementById('otherProjectGroup').style.display='none';document.getElementById('fProjectOther').value='';}
-  else if(l.project){document.getElementById('fProject').value='Other';document.getElementById('otherProjectGroup').style.display='block';document.getElementById('fProjectOther').value=l.project;}
+  else if(l.project){
+    document.getElementById('fProject').value='Other';
+    document.getElementById('otherProjectGroup').style.display='block';
+    document.getElementById('fProjectOther').value=l.project;
+    // Smart detect karo
+    setTimeout(function(){ detectAreaInProject(l.project); }, 100);
+  }
   else{document.getElementById('fProject').value='';document.getElementById('otherProjectGroup').style.display='none';}
   document.getElementById('fStatus').value=l.status||'warm';
   document.getElementById('fSource').value=l.source||'Meta Ads';
@@ -3073,6 +3284,8 @@ document.addEventListener('visibilitychange', function(){
 
 function callLead(id,phone){
   callingId=id;const l=leads.find(x=>x.id===id);if(!l)return;
+  // Current tab yaad rakhein — save ke baad wapas isi par aayenge
+  window._callFromTab = document.querySelector('.tab-content.active') ? document.querySelector('.tab-content.active').id.replace('tab-','') : 'leads';
 
   // Timer reset
   clearInterval(_callTimerInterval);
@@ -3140,8 +3353,9 @@ function saveCallRecord(){
   const followupDate=document.getElementById('callFollowupDate').value;let addedFollowup=false;
   if(followupChecked&&followupDate){leads[idx].nextDate=followupDate;leads[idx].nextTime=document.getElementById('callFollowupTime').value||'10:00';leads[idx].nextNote=document.getElementById('callFollowupNote').value.trim()||callRecord.notes||'';addedFollowup=true;}
   saveData();renderLeads();renderVisits();renderFollowups();updateStats();closeCallModal();
-  // ✅ Leads tab pe wapas jao
-  switchTabByName('leads');updateBottomNav('leads');
+  // ✅ Jis tab se call ki thi usi par wapas jao
+  var backTab = window._callFromTab || 'leads';
+  switchTabByName(backTab);updateBottomNav(backTab);
   // Call ke baad follow-up notification schedule karo
   const calledLead = leads.find(l=>l.id===callingId);
   if(calledLead && calledLead.nextDate && calledLead.nextTime) scheduleFollowupNotification(calledLead);
@@ -3539,7 +3753,7 @@ async function performDriveRestore(){
 
 window.addEventListener('load',()=>{setTimeout(()=>{initGoogleAuth();initDriveAuth();},800);});
 
-['leadModal','contactModal','visitModal','exportModal','callModal','callHistoryModal','leadHistoryModal'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('click',function(e){if(e.target===this)this.classList.remove('active');});});
+['leadModal','contactModal','visitModal','exportModal','callModal','callHistoryModal','leadHistoryModal','settingsModal'].forEach(id=>{const el=document.getElementById(id);if(el)el.addEventListener('click',function(e){if(e.target===this)this.classList.remove('active');});});
 
 if('serviceWorker' in navigator){
   window.addEventListener('load', function(){
@@ -4748,6 +4962,422 @@ window.addEventListener('load', function(){
 // ===== END FOLLOW-UP FIXER =====
 
 
+
+
+// ═══════════════════════════════════════════════════
+// SETTINGS PAGE
+// ═══════════════════════════════════════════════════
+var _appSettings = {};
+
+function loadSettings(){
+  try{ _appSettings = JSON.parse(localStorage.getItem('leado_settings')||'{}'); }catch(e){ _appSettings={}; }
+}
+
+function saveSetting(key, val){
+  _appSettings[key] = val;
+  localStorage.setItem('leado_settings', JSON.stringify(_appSettings));
+}
+
+function getSetting(key, def){
+  return _appSettings.hasOwnProperty(key) ? _appSettings[key] : def;
+}
+
+function openSettings(){
+  loadSettings();
+  document.getElementById('settingsModal').classList.add('active');
+  // Fill profile fields
+  document.getElementById('settName').value = getSetting('name', window._appProfile&&window._appProfile.name||'');
+  document.getElementById('settPhone').value = getSetting('phone', '');
+  document.getElementById('settCity').value = getSetting('city', 'Jaipur');
+  document.getElementById('settProfession').value = getSetting('profession', 'Real Estate');
+  // Avatar
+  var photo = getSetting('profilePhoto','');
+  var av = document.getElementById('settingsAvatarPreview');
+  if(av){
+    if(photo){ av.innerHTML='<img src="'+photo+'" style="width:100%;height:100%;object-fit:cover">'; }
+    else{ av.textContent = (getSetting('name','')||'K').charAt(0).toUpperCase(); }
+  }
+  // Theme buttons
+  var theme = getSetting('theme','dark');
+  ['dark','amoled','light'].forEach(function(t){
+    var b = document.getElementById('theme-'+t);
+    if(b) b.style.borderWidth = t===theme ? '2px' : '1px';
+    if(b) b.style.borderColor = t===theme ? 'var(--accent-primary)' : 'var(--border)';
+  });
+  // Font size
+  var fs = getSetting('fontSize','normal');
+  ['small','normal','large'].forEach(function(f){
+    var b = document.getElementById('font-'+f);
+    if(b) b.style.borderWidth = f===fs ? '2px' : '1px';
+    if(b) b.style.borderColor = f===fs ? 'var(--accent-primary)' : 'var(--border)';
+  });
+  // PIN timer
+  var pt = getSetting('pinTimer',5);
+  [1,5,15,0].forEach(function(v){
+    var id = v===0?'pin-never':'pin-'+v;
+    var b = document.getElementById(id);
+    if(b){ b.style.borderWidth = v===pt?'2px':'1px'; b.style.borderColor = v===pt?'var(--accent-primary)':'var(--border)'; }
+  });
+  // Morning time
+  var mt = getSetting('morningTime','08:00');
+  ['7','8','9','10'].forEach(function(h){
+    var b = document.getElementById('morn-'+h);
+    var hh = h.length===1?'0'+h:h;
+    if(b){ b.style.borderWidth = (hh+':00')===mt?'2px':'1px'; b.style.borderColor = (hh+':00')===mt?'var(--accent-primary)':'var(--border)'; }
+  });
+  document.getElementById('settMorningOn').checked = getSetting('morningBriefing', true);
+  document.getElementById('settDndOn').checked = getSetting('dndEnabled', false);
+  document.getElementById('settDndStart').value = getSetting('dndStart','22:00');
+  document.getElementById('settDndEnd').value = getSetting('dndEnd','08:00');
+  // Follow-up days
+  var fd = getSetting('defaultFollowupDays',3);
+  [1,2,3,5,7].forEach(function(d){
+    var b = document.getElementById('fu-'+d);
+    if(b){ b.style.borderWidth = d===fd?'2px':'1px'; b.style.borderColor = d===fd?'var(--accent-primary)':'var(--border)'; }
+  });
+  // WA template
+  document.getElementById('settWaTemplate').value = getSetting('waTemplate','Namaste {naam} Ji! Aapne {project} ke baare mein enquiry ki thi. Koi update ya information chahiye to batayein.');
+  // Projects & Sources
+  renderSettingsProjects();
+  renderSettingsSources();
+}
+
+function closeSettings(){
+  document.getElementById('settingsModal').classList.remove('active');
+}
+
+function saveProfileSettings(){
+  var name = document.getElementById('settName').value.trim();
+  var phone = document.getElementById('settPhone').value.trim();
+  var city = document.getElementById('settCity').value.trim();
+  var profession = document.getElementById('settProfession').value.trim();
+  saveSetting('name', name);
+  saveSetting('phone', phone);
+  saveSetting('city', city);
+  saveSetting('profession', profession);
+  // Update header
+  var hn = document.getElementById('headerName');
+  var hs = document.getElementById('headerSub');
+  var ha = document.getElementById('headerAvatar');
+  if(hn && name) hn.textContent = name + ' Ji';
+  if(hs) hs.textContent = (profession||'Real Estate') + ' · ' + (city||'Jaipur');
+  var photo = getSetting('profilePhoto','');
+  if(ha){
+    if(photo){ ha.innerHTML='<img src="'+photo+'" style="width:100%;height:100%;object-fit:cover;border-radius:inherit">'; }
+    else if(name){ ha.textContent = name.charAt(0).toUpperCase(); ha.innerHTML=''; ha.textContent = name.charAt(0).toUpperCase(); }
+  }
+  showToast('✅ Profile save ho gaya!','success');
+}
+
+function handleProfilePhoto(input){
+  if(!input.files||!input.files[0]) return;
+  var reader = new FileReader();
+  reader.onload = function(e){
+    var dataUrl = e.target.result;
+    saveSetting('profilePhoto', dataUrl);
+    var av = document.getElementById('settingsAvatarPreview');
+    if(av) av.innerHTML='<img src="'+dataUrl+'" style="width:100%;height:100%;object-fit:cover">';
+    var ha = document.getElementById('headerAvatar');
+    if(ha) ha.innerHTML='<img src="'+dataUrl+'" style="width:100%;height:100%;object-fit:cover;border-radius:inherit">';
+    showToast('✅ Photo update ho gaya!','success');
+  };
+  reader.readAsDataURL(input.files[0]);
+}
+
+function applyThemeSetting(theme){
+  saveSetting('theme', theme);
+  if(theme==='light'){ document.body.classList.add('light-mode'); document.body.style.background=''; }
+  else if(theme==='amoled'){ document.body.classList.remove('light-mode'); document.body.style.background='#000'; document.body.style.setProperty('--bg-dark','#000'); }
+  else{ document.body.classList.remove('light-mode'); document.body.style.background=''; }
+  ['dark','amoled','light'].forEach(function(t){
+    var b=document.getElementById('theme-'+t);
+    if(b){b.style.borderWidth=t===theme?'2px':'1px';b.style.borderColor=t===theme?'var(--accent-primary)':'var(--border)';}
+  });
+  showToast('✅ Theme change ho gaya!','success');
+}
+
+function applyFontSize(size){
+  saveSetting('fontSize', size);
+  var scale = size==='small'?0.9:size==='large'?1.1:1;
+  document.documentElement.style.fontSize = (scale*16)+'px';
+  ['small','normal','large'].forEach(function(f){
+    var b=document.getElementById('font-'+f);
+    if(b){b.style.borderWidth=f===size?'2px':'1px';b.style.borderColor=f===size?'var(--accent-primary)':'var(--border)';}
+  });
+}
+
+function changePinSetting(){
+  var oldPin = document.getElementById('settOldPin').value;
+  var newPin = document.getElementById('settNewPin').value;
+  var stored = localStorage.getItem('leado_pin')||'0000';
+  if(oldPin !== stored){ showToast('❌ Purana PIN galat hai!'); return; }
+  if(newPin.length !== 4){ showToast('⚠️ Naya PIN 4 digit ka hona chahiye!'); return; }
+  localStorage.setItem('leado_pin', newPin);
+  document.getElementById('settOldPin').value='';
+  document.getElementById('settNewPin').value='';
+  showToast('✅ PIN change ho gaya!','success');
+}
+
+function setPinTimer(mins){
+  saveSetting('pinTimer', mins);
+  [1,5,15,0].forEach(function(v){
+    var id=v===0?'pin-never':'pin-'+v;
+    var b=document.getElementById(id);
+    if(b){b.style.borderWidth=v===mins?'2px':'1px';b.style.borderColor=v===mins?'var(--accent-primary)':'var(--border)';}
+  });
+  showToast('✅ PIN timer set ho gaya!','success');
+}
+
+function setMorningTime(time){
+  saveSetting('morningTime', time);
+  var h = time.split(':')[0];
+  ['7','8','9','10'].forEach(function(hh){
+    var b=document.getElementById('morn-'+hh);
+    var t=(hh.length===1?'0'+hh:hh)+':00';
+    if(b){b.style.borderWidth=t===time?'2px':'1px';b.style.borderColor=t===time?'var(--accent-primary)':'var(--border)';}
+  });
+}
+
+function setDefaultFollowup(days){
+  saveSetting('defaultFollowupDays', days);
+  [1,2,3,5,7].forEach(function(d){
+    var b=document.getElementById('fu-'+d);
+    if(b){b.style.borderWidth=d===days?'2px':'1px';b.style.borderColor=d===days?'var(--accent-primary)':'var(--border)';}
+  });
+  showToast('✅ Default follow-up '+days+' din set!','success');
+}
+
+// PROJECTS MANAGE
+var _customProjects = null;
+function getProjects(){
+  if(!_customProjects){
+    try{ _customProjects = JSON.parse(localStorage.getItem('leado_projects')||'null'); }catch(e){}
+    if(!_customProjects) _customProjects = ['Imperial Estate','Imperial Galaxy','Solitair Home','Dream Town','Govind Vihar'];
+  }
+  return _customProjects;
+}
+function saveProjects(){
+  localStorage.setItem('leado_projects', JSON.stringify(_customProjects));
+  // Update lead form dropdown
+  var sel = document.getElementById('fProject');
+  if(sel){
+    var curr = sel.value;
+    sel.innerHTML = '<option value="">-- Project चुनें --</option>'
+      + _customProjects.map(function(p){ return '<option value="'+p+'">'+p+'</option>'; }).join('')
+      + '<option value="Other">Other (अन्य Project)</option>';
+    if(curr) sel.value = curr;
+  }
+}
+function renderSettingsProjects(){
+  var list = document.getElementById('settProjectsList');
+  if(!list) return;
+  list.innerHTML = getProjects().map(function(p,i){
+    // Check karo is project mein koi lead hai
+    var inUse = leads.some(function(l){ return l.project === p; });
+    var removeBtn = inUse
+      ? '<span style="padding:3px 8px;font-size:10px;color:var(--text-muted);background:var(--bg-card2);border-radius:6px;border:1px solid var(--border)">Leads hain</span>'
+      : '<button onclick="removeProject('+i+')" style="padding:3px 8px;background:rgba(255,71,87,.1);border:1px solid rgba(255,71,87,.3);border-radius:6px;color:var(--accent-red);cursor:pointer;font-size:11px">✕</button>';
+    return '<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">'
+      +'<span style="flex:1;font-size:12px;color:var(--text-primary)">🏗️ '+p+(inUse?' <span style="font-size:10px;color:var(--text-muted)">('+leads.filter(function(l){return l.project===p;}).length+' leads)</span>':'')+'</span>'
+      +removeBtn
+      +'</div>';
+  }).join('');
+}
+function addProject(){
+  var inp = document.getElementById('settNewProject');
+  var name = (inp.value||'').trim();
+  if(!name){ showToast('⚠️ Project naam daalo!'); return; }
+  if(getProjects().indexOf(name)>=0){ showToast('⚠️ Yeh project pehle se hai!'); return; }
+  _customProjects.push(name);
+  saveProjects(); renderSettingsProjects();
+  inp.value='';
+  showToast('✅ '+name+' add ho gaya!','success');
+}
+function removeProject(i){
+  if(!confirm('Delete project "'+_customProjects[i]+'"?')) return;
+  _customProjects.splice(i,1);
+  saveProjects(); renderSettingsProjects();
+}
+
+// SOURCES MANAGE
+var _customSources = null;
+function getSources(){
+  if(!_customSources){
+    try{ _customSources = JSON.parse(localStorage.getItem('leado_sources')||'null'); }catch(e){}
+    if(!_customSources) _customSources = ['Meta Ads','Google Ads','Referral','Cold Call','WhatsApp','99acres','MagicBricks','Walk-in'];
+  }
+  return _customSources;
+}
+function saveSources(){
+  localStorage.setItem('leado_sources', JSON.stringify(_customSources));
+  var sel = document.getElementById('fSource');
+  if(sel){
+    var curr = sel.value;
+    sel.innerHTML = _customSources.map(function(s){ return '<option value="'+s+'">'+s+'</option>'; }).join('');
+    if(curr) sel.value = curr;
+    else sel.value = _customSources[0]||'';
+  }
+}
+function renderSettingsSources(){
+  var list = document.getElementById('settSourcesList');
+  if(!list) return;
+  list.innerHTML = getSources().map(function(s,i){
+    return '<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px">'
+      +'<span style="flex:1;font-size:12px;color:var(--text-primary)">📢 '+s+'</span>'
+      +'<button onclick="removeSource('+i+')" style="padding:3px 8px;background:rgba(255,71,87,.1);border:1px solid rgba(255,71,87,.3);border-radius:6px;color:var(--accent-red);cursor:pointer;font-size:11px">✕</button>'
+      +'</div>';
+  }).join('');
+}
+function addSource(){
+  var inp = document.getElementById('settNewSource');
+  var name = (inp.value||'').trim();
+  if(!name){ showToast('⚠️ Source naam daalo!'); return; }
+  _customSources.push(name);
+  saveSources(); renderSettingsSources();
+  inp.value='';
+  showToast('✅ '+name+' add ho gaya!','success');
+}
+function removeSource(i){
+  _customSources.splice(i,1);
+  saveSources(); renderSettingsSources();
+}
+
+// BACKUP & RESTORE
+function backupData(){
+  var backup = { leads:leads, settings:_appSettings, projects:_customProjects, sources:_customSources, timestamp:new Date().toISOString() };
+  var blob = new Blob([JSON.stringify(backup,null,2)],{type:'application/json'});
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href=url; a.download='leado_backup_'+new Date().toISOString().split('T')[0]+'.json';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(url); },2000);
+  showToast('✅ Backup download ho gaya!','success');
+}
+function restoreData(input){
+  if(!input.files||!input.files[0]) return;
+  var reader = new FileReader();
+  reader.onload = function(e){
+    try{
+      var data = JSON.parse(e.target.result);
+      if(!confirm('Restore karoge? Current data replace ho jaayega!')) return;
+      if(data.leads){ leads = data.leads; saveData(); renderLeads(); updateStats(); }
+      if(data.settings){ _appSettings = data.settings; localStorage.setItem('leado_settings',JSON.stringify(_appSettings)); }
+      if(data.projects){ _customProjects = data.projects; saveProjects(); }
+      if(data.sources){ _customSources = data.sources; saveSources(); }
+      showToast('✅ Backup restore ho gaya!','success');
+      closeSettings();
+    }catch(err){ showToast('❌ File galat hai — valid backup choose karo'); }
+  };
+  reader.readAsText(input.files[0]);
+}
+
+// DATA CLEAR
+function clearAllData(type){
+  if(type==='all'){
+    if(!confirm('⚠️ SAARA DATA DELETE HOGA — Wapas nahi aayega!\n\nPehle backup lo!')) return;
+    leads = []; saveData(); renderLeads(); updateStats(); renderHomeDashboard();
+    showToast('✅ Saara data clear ho gaya','success');
+    closeSettings();
+  } else if(type==='calls'){
+    if(!confirm('Saari call history delete karni hai?')) return;
+    leads.forEach(function(l){ l.callHistory=[]; });
+    saveData(); updateStats();
+    showToast('✅ Call history clear ho gayi','success');
+  } else if(type==='visits'){
+    if(!confirm('Saari visits delete karni hain?')) return;
+    leads.forEach(function(l){ l.visited=false; l.visitDate=''; l.visitNotes=''; });
+    saveData(); renderVisits(); updateStats();
+    showToast('✅ Visits clear ho gayi','success');
+  }
+}
+
+// Load settings on start
+document.addEventListener('DOMContentLoaded', function(){
+  loadSettings();
+  // Apply saved theme
+  var savedTheme = getSetting('theme','dark');
+  if(savedTheme==='light') document.body.classList.add('light-mode');
+  else if(savedTheme==='amoled') document.body.style.background='#000';
+  // Apply saved font size
+  var savedFont = getSetting('fontSize','normal');
+  if(savedFont!=='normal') applyFontSize(savedFont);
+  // Apply saved profile
+  var savedName = getSetting('name','');
+  var savedCity = getSetting('city','Jaipur');
+  var savedProf = getSetting('profession','Real Estate');
+  var savedPhoto = getSetting('profilePhoto','');
+  if(savedName){
+    var hn=document.getElementById('headerName');
+    if(hn) hn.textContent = savedName+' Ji';
+  }
+  var hs=document.getElementById('headerSub');
+  if(hs && (savedCity||savedProf)) hs.textContent=(savedProf||'Real Estate')+' · '+(savedCity||'Jaipur');
+  if(savedPhoto){
+    var ha=document.getElementById('headerAvatar');
+    if(ha) ha.innerHTML='<img src="'+savedPhoto+'" style="width:100%;height:100%;object-fit:cover;border-radius:inherit">';
+  }
+});
+// ═══════════════════════════════════════════════════
+// END SETTINGS
+// ═══════════════════════════════════════════════════
+
+
+// ===== SMART AREA DETECTION IN PROJECT FIELD =====
+var _areaKeywords = [
+  'road','marg','nagar','vihar','colony','sector','block','ward','mohalla',
+  'chowk','crossing','circle','bypass','highway','path','lane','street',
+  'ajmer','vaishali','mansarovar','malviya','tonk','sikar','jagatpura',
+  'sanganer','kalwar','murlipura','pratap','vidyadhar','gandhi','nehru',
+  'per chahiye','chahiye','ke paas','ke pass','wala','wali','area',
+  'market','bazar','bazaar','chauraha','tiraha'
+];
+
+function detectAreaInProject(val){
+  var warn = document.getElementById('projectAreaWarn');
+  var msg = document.getElementById('projectAreaMsg');
+  if(!warn || !msg || !val || val.length < 3) {
+    if(warn) warn.style.display='none';
+    return;
+  }
+  var lower = val.toLowerCase();
+  var matched = _areaKeywords.find(function(kw){ return lower.indexOf(kw) >= 0; });
+  if(matched){
+    warn.style.display = 'block';
+    msg.textContent = '"'+val+'" mein "'+matched+'" word hai — yeh project naam nahi lagta. Area field mein daalna chahiye?';
+  } else {
+    warn.style.display = 'none';
+  }
+}
+
+function moveToArea(){
+  var projectOther = document.getElementById('fProjectOther');
+  var areaField = document.getElementById('fArea');
+  var warn = document.getElementById('projectAreaWarn');
+  if(!projectOther || !areaField) return;
+  var val = projectOther.value.trim();
+  if(val){
+    // Area field mein daalo
+    if(areaField.value && areaField.value.trim()){
+      areaField.value = areaField.value.trim() + ', ' + val;
+    } else {
+      areaField.value = val;
+    }
+    // Project field clear karo
+    projectOther.value = '';
+    if(warn) warn.style.display = 'none';
+    // Project dropdown reset karo
+    var projSel = document.getElementById('fProject');
+    if(projSel) projSel.value = '';
+    var otherGrp = document.getElementById('otherProjectGroup');
+    if(otherGrp) otherGrp.style.display = 'none';
+    showToast('✅ Area field mein move ho gaya!', 'success');
+    // Area field highlight karo
+    areaField.style.borderColor = 'var(--accent-gold)';
+    areaField.focus();
+    setTimeout(function(){ areaField.style.borderColor = ''; }, 2000);
+  }
+}
+// ===== END SMART AREA DETECTION =====
 
 </script>
 
