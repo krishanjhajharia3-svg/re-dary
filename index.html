@@ -961,6 +961,23 @@ body.light-mode .notif-item{border-color:#e2e8f0!important}
 body.light-mode .notif-title{color:#0f1923!important}
 body.light-mode .notif-time{color:#546e7a!important}
 body.light-mode .notif-close{background:rgba(0,0,0,.08)!important;border-color:rgba(0,0,0,.15)!important;color:#0f1923!important}
+/* Settings buttons mobile touch fix */
+#settingsModal button {
+  -webkit-tap-highlight-color: rgba(79,124,255,.2);
+  touch-action: manipulation;
+  cursor: pointer;
+  min-height: 40px;
+  position: relative;
+  z-index: 1;
+}
+#settingsModal input, #settingsModal select, #settingsModal textarea {
+  -webkit-tap-highlight-color: rgba(79,124,255,.2);
+  touch-action: manipulation;
+}
+#settingsModal .modal {
+  pointer-events: all !important;
+}
+
 </style>
 
 <!-- OneSignal Push Notifications -->
@@ -1124,7 +1141,7 @@ body.light-mode .notif-close{background:rgba(0,0,0,.08)!important;border-color:r
     <button class="icon-btn" onclick="showExportOptions()" title="Export">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
     </button>
-    <button class="icon-btn" onclick="openSettings()" title="Settings" id="settingsBtn">
+    <button class="icon-btn" onclick="openSettings()" title="Settings" id="settingsBtn" style="touch-action:manipulation;-webkit-tap-highlight-color:rgba(79,124,255,.2)">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
     </button>
   </div>
@@ -1643,8 +1660,8 @@ body.light-mode .notif-close{background:rgba(0,0,0,.08)!important;border-color:r
 
 
 <!-- ═══════ SETTINGS MODAL ═══════ -->
-<div class="modal-overlay" id="settingsModal">
-  <div class="modal" style="max-height:92vh;overflow-y:auto">
+<div class="modal-overlay" id="settingsModal" style="z-index:1000">
+  <div class="modal" style="max-height:92vh;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y">
     <div class="modal-handle"></div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
       <div class="modal-title" style="margin:0">⚙️ Settings</div>
@@ -1781,6 +1798,7 @@ body.light-mode .notif-close{background:rgba(0,0,0,.08)!important;border-color:r
           <input type="time" class="form-input" id="settDndEnd" value="08:00" style="margin:0;font-size:12px" onchange="saveSetting('dndEnd',this.value)">
         </div>
       </div>
+      <button onclick="testNotification()" style="width:100%;margin-top:10px;padding:9px;background:rgba(79,124,255,.1);border:1px solid rgba(79,124,255,.3);border-radius:10px;color:var(--accent-primary);cursor:pointer;font-size:12px;font-weight:600">🔔 Test Notification Bhejo</button>
     </div>
 
     <!-- APP BEHAVIOR -->
@@ -5378,6 +5396,159 @@ function moveToArea(){
   }
 }
 // ===== END SMART AREA DETECTION =====
+
+
+// ═══════════════════════════════════════════════════
+// DAILY NOTIFICATION SYSTEM — PWA
+// ═══════════════════════════════════════════════════
+function isDNDTime(){
+  try{ loadSettings(); }catch(e){}
+  if(!getSetting('dndEnabled',false)) return false;
+  var now = new Date();
+  var curr = now.getHours()*60 + now.getMinutes();
+  var start = (getSetting('dndStart','22:00')||'22:00').split(':');
+  var end = (getSetting('dndEnd','08:00')||'08:00').split(':');
+  var s = parseInt(start[0])*60+parseInt(start[1]||0);
+  var e = parseInt(end[0])*60+parseInt(end[1]||0);
+  return s>e ? (curr>=s||curr<e) : (curr>=s&&curr<e);
+}
+
+function sendLocalNotif(title, body, tag){
+  if(Notification.permission!=='granted') return;
+  if(isDNDTime()) return;
+  try{
+    var n = new Notification(title,{
+      body:body, icon:'/icon-192.png', badge:'/icon-192.png',
+      tag:tag||'leado', requireInteraction:false
+    });
+    n.onclick=function(){ window.focus(); n.close(); };
+  }catch(e){ console.log('Notif error:',e.message); }
+}
+
+function getFollowupStats(){
+  var today = new Date().toISOString().split('T')[0];
+  return {
+    todayFU: leads.filter(function(l){return l.nextDate===today;}),
+    overdueFU: leads.filter(function(l){return l.nextDate&&l.nextDate<today;}),
+    hotLeads: leads.filter(function(l){return l.status==='hot';})
+  };
+}
+
+function checkAndSendNotifs(){
+  if(Notification.permission!=='granted') return;
+  try{ loadSettings(); }catch(e){}
+  var now = new Date();
+  var h = now.getHours();
+  var m = now.getMinutes();
+  var todayStr = now.toDateString();
+
+  // ── Morning Briefing ──
+  if(getSetting('morningBriefing',true)){
+    var mTime = (getSetting('morningTime','09:00')||'09:00').split(':');
+    var mH=parseInt(mTime[0]), mM=parseInt(mTime[1]||0);
+    if(h===mH && m===mM){
+      var lastMorn = localStorage.getItem('leado_last_morning');
+      if(lastMorn!==todayStr){
+        var stats = getFollowupStats();
+        var total = stats.todayFU.length + stats.overdueFU.length;
+        if(total>0){
+          var body = '';
+          if(stats.todayFU.length>0) body += '📅 Aaj ke: '+stats.todayFU.length+' follow-up';
+          if(stats.overdueFU.length>0) body += (body?'\n':'')+'⚠️ Overdue: '+stats.overdueFU.length+' pending';
+          body += '\n👆 Tap karke call karein!';
+          sendLocalNotif('🔔 Leado — Aaj ke Follow-ups ('+total+')', body, 'morning-briefing');
+          localStorage.setItem('leado_last_morning', todayStr);
+        }
+      }
+    }
+  }
+
+  // ── Shaam 5 baje Hot Lead Alert ──
+  if(h===17 && m===0){
+    var lastEvening = localStorage.getItem('leado_last_evening');
+    if(lastEvening!==todayStr){
+      var stats2 = getFollowupStats();
+      if(stats2.hotLeads.length>0 && stats2.overdueFU.length>0){
+        var hotNames = stats2.hotLeads.slice(0,3).map(function(l){return l.name||l.phone;}).join(', ');
+        sendLocalNotif(
+          '🔥 Hot Leads Pending! — Aaj call karo',
+          hotNames + '\n' + stats2.overdueFU.length + ' overdue follow-ups hain abhi bhi!',
+          'evening-hot'
+        );
+        localStorage.setItem('leado_last_evening', todayStr);
+      }
+    }
+  }
+
+  // ── Dopahar 1 baje — Aaj ke baaki follow-ups reminder ──
+  if(h===13 && m===0){
+    var lastNoon = localStorage.getItem('leado_last_noon');
+    if(lastNoon!==todayStr){
+      var stats3 = getFollowupStats();
+      if(stats3.todayFU.length>0){
+        var pending = stats3.todayFU.filter(function(l){
+          // Unhe dikhao jinhe aaj call nahi ki
+          var lastCall = l.callHistory && l.callHistory.length ? l.callHistory[l.callHistory.length-1].date : '';
+          return !lastCall || !lastCall.startsWith(new Date().toISOString().split('T')[0]);
+        });
+        if(pending.length>0){
+          sendLocalNotif(
+            '⏰ '+pending.length+' Follow-up Baaki Hain Aaj!',
+            pending.slice(0,3).map(function(l){return l.name||l.phone;}).join(', ')+'\n👆 Tap karke dekhein',
+            'noon-reminder'
+          );
+          localStorage.setItem('leado_last_noon', todayStr);
+        }
+      }
+    }
+  }
+}
+
+// ── Scheduler start karo ──
+function startNotifScheduler(){
+  if(window._notifScheduler) clearInterval(window._notifScheduler);
+  // Har 60 second mein check karo
+  window._notifScheduler = setInterval(checkAndSendNotifs, 60000);
+  console.log('✅ Notification scheduler started');
+}
+
+// ── Permission maango agar nahi hai ──
+function requestNotifPermission(){
+  if(!('Notification' in window)) return;
+  if(Notification.permission==='default'){
+    Notification.requestPermission().then(function(p){
+      if(p==='granted'){ startNotifScheduler(); showToast('✅ Notifications on ho gayi!','success'); }
+    });
+  } else if(Notification.permission==='granted'){
+    startNotifScheduler();
+  }
+}
+
+// App load hone par start karo
+window.addEventListener('load', function(){
+  setTimeout(function(){
+    requestNotifPermission();
+  }, 3000);
+});
+
+// Notification test function — Settings mein use hoga
+function testNotification(){
+  if(Notification.permission!=='granted'){
+    requestNotifPermission();
+    return;
+  }
+  var stats = getFollowupStats();
+  var total = stats.todayFU.length + stats.overdueFU.length;
+  sendLocalNotif(
+    '🔔 Test — Leado Notification',
+    'Notification kaam kar rahi hai!\n' + (total>0 ? total+' follow-ups pending hain.' : 'Aaj koi follow-up nahi.'),
+    'test-notif'
+  );
+  showToast('✅ Test notification bheji!','success');
+}
+// ═══════════════════════════════════════════════════
+// END NOTIFICATION SYSTEM
+// ═══════════════════════════════════════════════════
 
 </script>
 
